@@ -17,7 +17,10 @@ enum {
     EXIT,
     LOAD,
     STORE,
-    LHOP
+    LHOP,
+    LHOPT,
+    PRINTR,
+    EQ,
 };
 
 int get_opcode(char *word);

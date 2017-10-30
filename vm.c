@@ -47,10 +47,10 @@ void vm_execute(executable_t *e) {
     int *reg;
 
     while (running) {
-        dump_cpu();
+        // dump_cpu();
         op = ram[cpu->pc];
 
-        printf("OP: %d \n \n", op);
+        // printf("OP: %d \n \n", op);
 
         switch (op) {
             case NOP:
@@ -80,6 +80,26 @@ void vm_execute(executable_t *e) {
             case LHOP:
                 cpu->pc = ram[cpu->pc + 1] - 1;
                 break;
+
+            case LHOPT:
+                if (cpu->flgs.cmp)
+                    cpu->pc = ram[cpu->pc + 1] - 1;
+                else
+                    ++cpu->pc;
+
+                break;
+
+            case EQ:
+                val = ram[++cpu->pc];
+                reg = get_register(ram[++cpu->pc]);
+                cpu->flgs.cmp = (val == *reg);
+                break;
+
+            case PRINTR:
+                reg = get_register(ram[++cpu->pc]);
+                putchar(*reg);
+                break;
+                
 
             case EXIT:
                 running = 0;

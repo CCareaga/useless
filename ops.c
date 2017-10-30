@@ -10,7 +10,10 @@ op_t operations[] = {
     {0, "EXIT"},
     {2, "LOAD"},
     {2, "STORE"},
-    {1, "LHOP"}
+    {1, "LHOP"},
+    {1, "LHOPT"},
+    {1, "PRINTR"},
+    {2, "EQ"}
 };
 
 rcode_t registers[] = {

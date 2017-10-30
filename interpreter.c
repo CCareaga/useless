@@ -89,6 +89,7 @@ void encode(char *word, executable_t *exec) {
     else opcode = get_opcode(word);
 
     exec->code[exec->length] = opcode;
+    printf("ADDRESS: %lu   =>   TOKEN: %s -> OPCODE: %d \n", exec->length, word, opcode);
     exec->length += 1;
 }
 
