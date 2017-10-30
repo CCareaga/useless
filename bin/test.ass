@@ -1,3 +1,5 @@
+NULL
+
 ENTRY
 
 LHOP LABEL2
@@ -8,9 +10,14 @@ $LABEL3
 
 $LABEL1
     STORE  456 B
-    EXIT
+    LHOP LABEL4
 
 $LABEL2
     STORE 789 C
     LHOP LABEL3
+
+$LABEL4
+    ADD 3 A
+    NOP
+    EXIT
 

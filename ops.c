@@ -7,7 +7,6 @@
 op_t operations[] = {
     {2, "ADD"},
     {2, "SUB"},
-    {0, "ENTRY"},
     {0, "EXIT"},
     {2, "LOAD"},
     {2, "STORE"},
@@ -20,6 +19,8 @@ rcode_t registers[] = {
     {"C"}
 };
 
+// searches through the arrays of operations and registers to determine
+// the opcode for a given word. if no opcode is found via arrays, atoi is used
 int get_opcode(char *word) {
     int op_count  = sizeof(operations) / sizeof(op_t); 
     int reg_count = sizeof(registers) / sizeof(rcode_t); 

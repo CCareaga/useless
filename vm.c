@@ -8,6 +8,7 @@
 static int *ram;
 static cpu_t *cpu;
 
+// given an integer opcode, the corresponding register is returned.
 int *get_register(int code) {
     switch (code) {
         case 1:
@@ -23,7 +24,8 @@ int *get_register(int code) {
             return NULL;
     }
 }
- 
+
+// print the program counter and registers
 void dump_cpu() {
     printf("pc: %d \n", cpu->pc);
     printf("a: %d \n", cpu->a);
@@ -31,6 +33,8 @@ void dump_cpu() {
     printf("c: %d \n", cpu->c);
 }
 
+// executes a given executable
+// TODO: change from switch statement to function pointers
 void vm_execute(executable_t *e) {
     ram = malloc(RAM_SZ); 
     cpu = malloc(sizeof(cpu_t)); 
@@ -50,7 +54,6 @@ void vm_execute(executable_t *e) {
 
         switch (op) {
             case NOP:
-                cpu->pc++;
                 break;
 
             case ADD:

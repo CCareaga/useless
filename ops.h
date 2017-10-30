@@ -14,7 +14,6 @@ enum {
     NOP,
     ADD,
     SUB,
-    ENTRY,
     EXIT,
     LOAD,
     STORE,
