@@ -49,68 +49,70 @@ void vm_execute(executable_t *e) {
     while (running) {
         // dump_cpu();
         op = ram[cpu->pc];
-
-        // printf("OP: %d \n \n", op);
-
-        switch (op) {
-            case NOP:
-                break;
-
-            case ADD:
-                val = ram[++cpu->pc];
-                reg = get_register(ram[++cpu->pc]);
-
-                *reg += val;
-                break;
-
-            case SUB:
-                val = ram[++cpu->pc];
-                reg = get_register(ram[++cpu->pc]);
-
-                *reg -= val;
-                break;
-
-            case STORE:
-                val = ram[++cpu->pc];
-                reg = get_register(ram[++cpu->pc]);
-
-                *reg = val;
-                break;
-
-            case LHOP:
-                cpu->pc = ram[cpu->pc + 1] - 1;
-                break;
-
-            case LHOPT:
-                if (cpu->flgs.cmp)
-                    cpu->pc = ram[cpu->pc + 1] - 1;
-                else
-                    ++cpu->pc;
-
-                break;
-
-            case EQ:
-                val = ram[++cpu->pc];
-                reg = get_register(ram[++cpu->pc]);
-                cpu->flgs.cmp = (val == *reg);
-                break;
-
-            case PRINTR:
-                reg = get_register(ram[++cpu->pc]);
-                putchar(*reg);
-                break;
-                
-
-            case EXIT:
-                running = 0;
-                break;
-
-            default: 
-                printf("unrecognized op... oh no");
-                running = 0;
-        }
-
+		running = operations[op].func(cpu, ram);
+//
+//        switch (op) {
+//            case NOP:
+//                break;
+//
+//            case ADD:
+//                val = ram[++cpu->pc];
+//                reg = get_register(ram[++cpu->pc]);
+//
+//                *reg += val;
+//                break;
+//
+//            case SUB:
+//                val = ram[++cpu->pc];
+//                reg = get_register(ram[++cpu->pc]);
+//
+//                *reg -= val;
+//                break;
+//
+//            case STORE:
+//                val = ram[++cpu->pc];
+//                reg = get_register(ram[++cpu->pc]);
+//
+//                *reg = val;
+//                break;
+//
+//            case LHOP:
+//                cpu->pc = ram[cpu->pc + 1] - 1;
+//                break;
+//
+//            case LHOPT:
+//                if (cpu->flgs.cmp)
+//                    cpu->pc = ram[cpu->pc + 1] - 1;
+//                else
+//                    ++cpu->pc;
+//                break;
+//
+//            case EQ:
+//                val = ram[++cpu->pc];
+//                reg = get_register(ram[++cpu->pc]);
+//
+//                cpu->flgs.cmp = (val == *reg);
+//                break;
+//
+//            case PRINTR:
+//                reg = get_register(ram[++cpu->pc]);
+//                putchar(*reg);
+//                break;
+//                
+//
+//            case EXIT:
+//                running = 0;
+//                break;
+//
+//            default: 
+//                printf("unrecognized op... oh no");
+//                running = 0;
+//        }
+//
         cpu->pc++;
     }
+
+    free(ram);
+    free(cpu);
 }
 

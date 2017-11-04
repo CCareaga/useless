@@ -6,17 +6,31 @@ STORE 10 C
 
 LHOP loop
 
-$end
-    PRINTR C
-    EXIT
-
 $loop
     ADD 1 A
 
     PRINTR A
     PRINTR B
 
-    EQ 55 A
-    LHOPT end
+    EQ 57 A
+    LHOPT letters
     LHOP loop
+
+$letters
+    PRINTR C
+    STORE 64 A
+    
+$loop2
+    ADD 1 A
+
+    PRINTR A
+    PRINTR B
+
+    EQ 90 A
+    LHOPT end
+    LHOP loop2
+
+$end
+    PRINTR C
+    EXIT
     

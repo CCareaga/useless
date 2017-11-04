@@ -1,9 +1,12 @@
 #ifndef _OPS_H
 #define _OPS_H
 
+#include "instruction.h"
+
 typedef struct {
     int argc;           // arg count
     const char *op_str; // operation name
+	int (*func) (cpu_t *cpu, int *ram);
 } op_t;
 
 typedef struct {
@@ -22,6 +25,8 @@ enum {
     PRINTR,
     EQ,
 };
+
+extern op_t operations[];
 
 int get_opcode(char *word);
 

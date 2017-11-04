@@ -5,15 +5,16 @@
 #include "vm.h"
 
 op_t operations[] = {
-    {2, "ADD"},
-    {2, "SUB"},
-    {0, "EXIT"},
-    {2, "LOAD"},
-    {2, "STORE"},
-    {1, "LHOP"},
-    {1, "LHOPT"},
-    {1, "PRINTR"},
-    {2, "EQ"}
+	{0, "NOP", nop},
+    {2, "ADD", add},
+    {2, "SUB", sub},
+    {0, "EXIT", vexit},
+    {2, "LOAD", NULL},
+    {2, "STORE", store},
+    {1, "LHOP", lhop},
+    {1, "LHOPT", lhopt},
+    {1, "PRINTR", printr},
+    {2, "EQ", equ}
 };
 
 rcode_t registers[] = {
@@ -31,7 +32,7 @@ int get_opcode(char *word) {
 
     for (i = 0; i < op_count; i++) {
         if (strcmp(operations[i].op_str, word) == 0) {
-            return i + 1;
+            return i;
         }
     }
 

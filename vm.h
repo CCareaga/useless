@@ -27,5 +27,6 @@ typedef struct {
 } vm_t;
 
 void vm_execute(executable_t *e);
+int *get_register(int code);
 
 #endif // _VM_H
