@@ -4,6 +4,7 @@
 #include "interpreter.h"
 
 #define RAM_SZ 4096
+
 typedef struct {
     int cmp : 1;
 } flags_t;

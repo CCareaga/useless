@@ -36,7 +36,7 @@ int is_label(char *word, executable_t *exec) {
 
 // returns 1 if the given word is a keyword, otherwise 0
 int is_keyword(char *word) {
-    if (strcmp(word, "ENTRY") == 0 || word[0] == '$') return 1;
+    if (word[0] == '$') return 1;
     else return 0;
 }
 
@@ -60,19 +60,17 @@ void lbl_insert(executable_t *exec, lnode_t *lbl) {
 // checks if a word is a keyword, if it is, neccesary actions are done
 // this gets called on each word during the first pass of the interpreter
 int keyword_check(char *word, executable_t *exec) {
-    if (strcmp(word, "ENTRY") == 0) {
-        exec->entry = exec->length;
-    }
-    else if (word[0] == '$') {
-        exec->length--;
+
+    if (word[0] == '$') {
         lnode_t *lbl = malloc(sizeof(lnode_t));
 
         char *lbl_name = strdup((++word));
         lbl->name = lbl_name;
         lbl->address = exec->length;
         lbl_insert(exec, lbl); 
+        exec->length--;
     }
-    
+
     exec->length++;
     return is_keyword(word);
 }
@@ -138,7 +136,8 @@ executable_t *vm_load(char *fn) {
     executable_t *exec = malloc(sizeof(executable_t));
 
     exec->code = malloc(RAM_SZ);
-    exec->length = 0;
+    exec->entry  = 1;
+    exec->length = 1;
 
     fp = fopen(fn, "r");
     if (!fp) return NULL;
@@ -148,7 +147,7 @@ executable_t *vm_load(char *fn) {
     }
 
 
-    exec->length = 0;
+    exec->length = 1;
 
     rewind(fp);
     while ((read = getline(&line, &len, fp)) != -1) {

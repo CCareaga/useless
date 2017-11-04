@@ -20,95 +20,63 @@ int *get_register(int code) {
         case 3:
             return &cpu->c;
 
+        case 4:
+            return &cpu->sp;
+
+        case 5:
+            return &cpu->bp;
+
         default:
             return NULL;
     }
 }
 
+void dump_stack() {
+    int i = cpu->sp;
+    
+    printf("======== STACK ========\n");
+    while (i < RAM_SZ) {
+        printf("%d: %d\n", i++, ram[i]);
+    }
+    printf("=======================\n\n");
+}
 // print the program counter and registers
 void dump_cpu() {
+
+    printf("========= CPU ==========\n");
     printf("pc: %d \n", cpu->pc);
-    printf("a: %d \n", cpu->a);
-    printf("b: %d \n", cpu->b);
-    printf("c: %d \n", cpu->c);
+    printf("a:  %d \n", cpu->a);
+    printf("b:  %d \n", cpu->b);
+    printf("c:  %d \n", cpu->c);
+
+    printf("sp: %d \n", cpu->sp);
+    printf("bp: %d \n", cpu->bp);
+    printf("========================\n\n");
 }
 
 // executes a given executable
-// TODO: change from switch statement to function pointers
 void vm_execute(executable_t *e) {
     ram = malloc(RAM_SZ); 
     cpu = malloc(sizeof(cpu_t)); 
+
+    memset(ram, 0, RAM_SZ);
+    memset(cpu, 0, sizeof(cpu_t));
     
     memcpy(ram, e->code, (e->length * sizeof(int)));
     cpu->pc = e->entry;
 
+    cpu->sp = RAM_SZ - 1;
+    cpu->bp = RAM_SZ - 1;
+
+    int op;
     int running = 1;
-    int op, val;
-    int *reg;
 
     while (running) {
         // dump_cpu();
+        dump_stack();
+
         op = ram[cpu->pc];
 		running = operations[op].func(cpu, ram);
-//
-//        switch (op) {
-//            case NOP:
-//                break;
-//
-//            case ADD:
-//                val = ram[++cpu->pc];
-//                reg = get_register(ram[++cpu->pc]);
-//
-//                *reg += val;
-//                break;
-//
-//            case SUB:
-//                val = ram[++cpu->pc];
-//                reg = get_register(ram[++cpu->pc]);
-//
-//                *reg -= val;
-//                break;
-//
-//            case STORE:
-//                val = ram[++cpu->pc];
-//                reg = get_register(ram[++cpu->pc]);
-//
-//                *reg = val;
-//                break;
-//
-//            case LHOP:
-//                cpu->pc = ram[cpu->pc + 1] - 1;
-//                break;
-//
-//            case LHOPT:
-//                if (cpu->flgs.cmp)
-//                    cpu->pc = ram[cpu->pc + 1] - 1;
-//                else
-//                    ++cpu->pc;
-//                break;
-//
-//            case EQ:
-//                val = ram[++cpu->pc];
-//                reg = get_register(ram[++cpu->pc]);
-//
-//                cpu->flgs.cmp = (val == *reg);
-//                break;
-//
-//            case PRINTR:
-//                reg = get_register(ram[++cpu->pc]);
-//                putchar(*reg);
-//                break;
-//                
-//
-//            case EXIT:
-//                running = 0;
-//                break;
-//
-//            default: 
-//                printf("unrecognized op... oh no");
-//                running = 0;
-//        }
-//
         cpu->pc++;
     }
 

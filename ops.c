@@ -13,14 +13,19 @@ op_t operations[] = {
     {2, "STORE", store},
     {1, "LHOP", lhop},
     {1, "LHOPT", lhopt},
+    {1, "LHOPF", lhopf},
     {1, "PRINTR", printr},
+    {1, "PUSH", push},
+    {0, "POP", pop},
     {2, "EQ", equ}
 };
 
 rcode_t registers[] = {
     {"A"},
     {"B"},
-    {"C"}
+    {"C"},
+    {"SP"},
+    {"BP"}
 };
 
 // searches through the arrays of operations and registers to determine

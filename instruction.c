@@ -46,17 +46,38 @@ int lhopt(cpu_t *cpu, int *ram) {
 	return 1;
 }
 
-int equ(cpu_t *cpu, int *ram) {
-	int val = ram[++cpu->pc];
-	int *reg = get_register(ram[++cpu->pc]);
-
-	cpu->flgs.cmp = (val == *reg);
+int lhopf(cpu_t *cpu, int *ram) {
+	if (!cpu->flgs.cmp)
+		cpu->pc = ram[cpu->pc + 1] - 1;
+	else
+		++cpu->pc;
 	return 1;
 }
 
 int printr(cpu_t *cpu, int *ram) {
 	int *reg = get_register(ram[++cpu->pc]);
 	putchar(*reg);
+	return 1;
+}
+
+int push(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    ram[--cpu->sp] = val;
+    return 1;
+}
+
+int pop(cpu_t *cpu, int *ram) { 
+    if (cpu->sp < (RAM_SZ - 1)) {
+        cpu->sp++; 
+    }
+    return 1;
+}
+
+int equ(cpu_t *cpu, int *ram) {
+	int val = ram[++cpu->pc];
+	int *reg = get_register(ram[++cpu->pc]);
+
+	cpu->flgs.cmp = (val == *reg);
 	return 1;
 }
 

@@ -1,0 +1,66 @@
+instructions to make useless usable:
+
+math:
+    4 flavors: 
+        R  - operand 1 is a literal, operand 2 is a register
+        L  - operand 1 is a literal, operand 2 is a label
+        RL - operand 1 is a register, operand 2 is a label
+        LR - operand 1 is a label, operand 2 is a register
+    
+    NOTE: resulting values are stored in operand 2
+    
+    one of the followinf for each flavor:
+        ADD - add operand 1 to value in operand 2
+        SUB - subtract operand 1 from value in operand 2
+        MUL - multiply operand 1 by value in operand 2
+        DIV - divide operand 2 by operand 1
+        MOD - modulus operand 1 with operand 2
+
+conditionals:
+    3 flavors:
+        R  - compare literal to register
+        L  - compare literal to a label
+        RL - compare register to label
+    
+    one of the following for each flavor:
+        EQ   - are the operands equal
+        NEQ  - are the operands not equal
+        LT   - is operand 1 < operand 2
+        LTE  - is operand 1 < or = operand 2
+        GE   - is operand 1 > operand 2
+        GTE  - is operand 1 > or = operand 2
+
+storage and loading:
+    
+    dereferencing:
+        DREFR - dereference register and store result in register
+        DREFL - dereference register and store result in a label
+
+    moving:
+        MVRL - move value from register to label
+        MVLR - move value from label to register
+        MVRR - move value from register to  register
+        MVLL - move value from label to label
+
+    store:
+        STORER - store literal in register
+        STOREL - store literal at label
+
+conditional hops:
+    HOPT - hop if last comparison was true
+    HOPF - hop if last comparison was false (maybe redundant)
+
+
+stack operations:
+    3 flavors of PUSH and POP:
+        literal  - push or a pop a literal
+        register - push or pop using a register
+        label    - push or pop using a label
+
+routine calling:
+    routine calling will be done using labels and the stack
+
+    CALL - call a function starting at a label
+    RET  - return from a function
+
+TODO: probably binary operators
