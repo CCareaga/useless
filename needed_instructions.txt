@@ -47,14 +47,14 @@ storage and loading:
         STOREL - store literal at label
 
 conditional hops:
-    HOPT - hop if last comparison was true
-    HOPF - hop if last comparison was false (maybe redundant)
+    HOPT - hop if last comparison was true [x]
+    HOPF - hop if last comparison was false [x]
 
 
 stack operations:
     3 flavors of PUSH and POP:
-        literal  - push or a pop a literal
-        register - push or pop using a register
+        literal  - push or a pop a literal [x]
+        register - push or pop using a register [x]
         label    - push or pop using a label
 
 routine calling:

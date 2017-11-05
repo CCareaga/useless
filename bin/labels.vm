@@ -1,0 +1,19 @@
+STORER word A
+STORER 10 C
+PRINTR C
+
+$loop
+    MVRR A B
+    DREFR B B
+    PRINTR B
+
+    EQ 0 B
+    ADD 1 A
+
+    LHOPF loop
+
+PRINTR C
+EXIT
+
+$word 73 32 97 109 32 117 115 101 108 101 115 115 0 
+

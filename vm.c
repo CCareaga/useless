@@ -31,12 +31,13 @@ int *get_register(int code) {
     }
 }
 
-void dump_stack() {
-    int i = cpu->sp;
+void dump_stack(cpu_t *c) {
+    int i = c->sp;
     
     printf("======== STACK ========\n");
     while (i < RAM_SZ) {
-        printf("%d: %d\n", i++, ram[i]);
+        printf("%d: %d\n", i, ram[i]);
+        i++;
     }
     printf("=======================\n\n");
 }
@@ -73,7 +74,7 @@ void vm_execute(executable_t *e) {
 
     while (running) {
         // dump_cpu();
-        dump_stack();
+        // dump_stack(cpu);
 
         op = ram[cpu->pc];
 		running = operations[op].func(cpu, ram);

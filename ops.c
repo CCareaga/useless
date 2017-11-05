@@ -10,13 +10,22 @@ op_t operations[] = {
     {2, "SUB", sub},
     {0, "EXIT", vexit},
     {2, "LOAD", NULL},
-    {2, "STORE", store},
+    {2, "STORER", storer},
+    {2, "STOREL", storel},
+    {2, "MVRL", mvrl},
+    {2, "MVLR", mvlr},
+    {2, "MVRR", mvrr},
+    {2, "MVLL", mvll},
+    {2, "DREFR", drefr},
     {1, "LHOP", lhop},
     {1, "LHOPT", lhopt},
     {1, "LHOPF", lhopf},
     {1, "PRINTR", printr},
+    {1, "PRINTL", printl},
     {1, "PUSH", push},
+    {1, "PUSHR", pushr},
     {0, "POP", pop},
+    {1, "POPR", popr},
     {2, "EQ", equ}
 };
 
