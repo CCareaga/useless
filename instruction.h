@@ -7,8 +7,8 @@ int nop(cpu_t *cpu, int *ram);
 int add(cpu_t *cpu, int *ram);
 int sub(cpu_t *cpu, int *ram);
 
-int storer(cpu_t *cpu, int *ram);
-int storel(cpu_t *cpu, int *ram);
+int storr(cpu_t *cpu, int *ram);
+int storl(cpu_t *cpu, int *ram);
 
 int mvrl(cpu_t *cpu, int *ram);
 int mvlr(cpu_t *cpu, int *ram);
@@ -16,6 +16,7 @@ int mvrr(cpu_t *cpu, int *ram);
 int mvll(cpu_t *cpu, int *ram);
 
 int drefr(cpu_t *cpu, int *ram);
+int drefl(cpu_t *cpu, int *ram);
 
 int lhop(cpu_t *cpu, int *ram);
 int lhopt(cpu_t *cpu, int *ram);

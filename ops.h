@@ -13,19 +13,6 @@ typedef struct {
     const char *name;   // register name
 } rcode_t;
 
-enum {
-    NOP,
-    ADD,
-    SUB,
-    EXIT,
-    LOAD,
-    STORE,
-    LHOP,
-    LHOPT,
-    PRINTR,
-    EQ,
-};
-
 extern op_t operations[];
 
 int get_opcode(char *word);

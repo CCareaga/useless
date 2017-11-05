@@ -97,7 +97,7 @@ void assemble(char* line, executable_t *exec, int pass) {
     int in_word = 0; 
     char *start;
 
-    while (*line) {
+    while (*line != '\0' && *line != '~') {
         if (!in_word) {
             if (!(isspace(*line))) {
                 start = line;

@@ -79,6 +79,7 @@ void vm_execute(executable_t *e) {
         op = ram[cpu->pc];
 		running = operations[op].func(cpu, ram);
         cpu->pc++;
+        // getchar();
     }
 
     free(ram);

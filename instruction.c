@@ -28,7 +28,7 @@ int sub(cpu_t *cpu, int *ram) {
 // ===============================================
 
 // STORAGE INSTRUCTIONS ==========================
-int storer(cpu_t *cpu, int *ram) {
+int storr(cpu_t *cpu, int *ram) {
     int val = ram[++cpu->pc];
     int *reg = get_register(ram[++cpu->pc]);
 
@@ -36,7 +36,7 @@ int storer(cpu_t *cpu, int *ram) {
 	return 1;
 }
 
-int storel(cpu_t *cpu, int *ram) {
+int storl(cpu_t *cpu, int *ram) {
     int val = ram[++cpu->pc];
     int lbl = ram[++cpu->pc];
     ram[lbl] = val;
@@ -81,6 +81,14 @@ int drefr(cpu_t *cpu, int *ram) {
     int *r2 = get_register(ram[++cpu->pc]);
 
     *r2 = ram[*r1];
+    return 1;
+}
+
+int drefl(cpu_t *cpu, int *ram) {
+    int lbl = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
+
+    *reg = ram[lbl];
     return 1;
 }
 // ===============================================

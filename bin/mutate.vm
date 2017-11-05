@@ -1,0 +1,22 @@
+STORR 96 A
+
+~ loop though characters until we get to 'd'
+~ then hop to mutate, in mutate we change the SUB instruction to SUB
+~ and we change the first instruction after mutate into EXIT so that
+~ on the second run of the loop we decrement and then exit the program
+
+$loop
+    ADD 1 A
+    PRINTR A
+    EQ 100 A
+    LHOPT mutate
+    LHOP loop
+
+$mutate
+    PRINTL newline
+    STORL 2 loop
+    STORR 104 A
+    STORL 3 mutate
+    LHOP loop
+
+$newline 10
