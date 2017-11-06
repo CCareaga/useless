@@ -10,21 +10,89 @@ int nop(cpu_t *cpu, int *ram) {
 }
 
 // MATH INSTRUCTIONS =============================
-int add(cpu_t *cpu, int *ram) {
-	int val = ram[++cpu->pc];
-	int *reg = get_register(ram[++cpu->pc]);
+
+// literal and register
+int addr(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
 
     *reg += val;
-	return 1;
+    return 1;
 }
 
-int sub(cpu_t *cpu, int *ram) {
+int subr(cpu_t *cpu, int *ram) {
     int val = ram[++cpu->pc];
-	int *reg = get_register(ram[++cpu->pc]);
+    int *reg = get_register(ram[++cpu->pc]);
 
-	*reg -= val;
-	return 1;
+    *reg -= val;
+    return 1;
 }
+
+int mulr(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
+
+    *reg *= val;
+    return 1;
+}
+
+int divr(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
+
+    *reg /= val;
+    return 1;
+}
+
+int modr(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
+
+    *reg %= val;
+    return 1;
+}
+
+// literal and label
+int addl(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int lbl = ram[++cpu->pc];
+
+    ram[lbl] += val;
+    return 1;
+}
+
+int subl(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int lbl = ram[++cpu->pc];
+
+    ram[lbl] -= val;
+    return 1;
+}
+
+int mull(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int lbl = ram[++cpu->pc];
+
+    ram[lbl] *= val;
+    return 1;
+}
+
+int divl(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int lbl = ram[++cpu->pc];
+
+    ram[lbl] /= val;
+    return 1;
+}
+
+int modl(cpu_t *cpu, int *ram) {
+    int val = ram[++cpu->pc];
+    int lbl = ram[++cpu->pc];
+
+    ram[lbl] %= val;
+    return 1;
+}
+
 // ===============================================
 
 // STORAGE INSTRUCTIONS ==========================
@@ -33,7 +101,7 @@ int storr(cpu_t *cpu, int *ram) {
     int *reg = get_register(ram[++cpu->pc]);
 
     *reg = val;
-	return 1;
+    return 1;
 }
 
 int storl(cpu_t *cpu, int *ram) {
@@ -95,38 +163,38 @@ int drefl(cpu_t *cpu, int *ram) {
 
 // HOP INSTRUCTIONS ==============================
 int lhop(cpu_t *cpu, int *ram) {
-	cpu->pc = ram[cpu->pc + 1] - 1;
-	return 1;
+    cpu->pc = ram[cpu->pc + 1] - 1;
+    return 1;
 }
 
 int lhopt(cpu_t *cpu, int *ram) {
-	if (cpu->flgs.cmp)
-		cpu->pc = ram[cpu->pc + 1] - 1;
-	else
-		++cpu->pc;
-	return 1;
+    if (cpu->flgs.cmp)
+        cpu->pc = ram[cpu->pc + 1] - 1;
+    else
+        ++cpu->pc;
+    return 1;
 }
 
 int lhopf(cpu_t *cpu, int *ram) {
-	if (!cpu->flgs.cmp)
-		cpu->pc = ram[cpu->pc + 1] - 1;
-	else
-		++cpu->pc;
-	return 1;
+    if (!cpu->flgs.cmp)
+        cpu->pc = ram[cpu->pc + 1] - 1;
+    else
+        ++cpu->pc;
+    return 1;
 }
 // ===============================================
 
 // PRINT INSTRUCTIONS ============================
 int printr(cpu_t *cpu, int *ram) {
-	int *reg = get_register(ram[++cpu->pc]);
-	putchar(*reg);
-	return 1;
+    int *reg = get_register(ram[++cpu->pc]);
+    putchar(*reg);
+    return 1;
 }
 
 int printl(cpu_t *cpu, int *ram) {
     int lbl = ram[++cpu->pc];
-	putchar(ram[lbl]);
-	return 1;
+    putchar(ram[lbl]);
+    return 1;
 }
 // ===============================================
 
@@ -138,7 +206,7 @@ int push(cpu_t *cpu, int *ram) {
 }
 
 int pushr(cpu_t *cpu, int *ram) {
-	int *reg = get_register(ram[++cpu->pc]);
+    int *reg = get_register(ram[++cpu->pc]);
     ram[--cpu->sp] = *reg;
     return 1;
 }
@@ -151,7 +219,7 @@ int pop(cpu_t *cpu, int *ram) {
 }
 
 int popr(cpu_t *cpu, int *ram) { 
-	int *reg = get_register(ram[++cpu->pc]);
+    int *reg = get_register(ram[++cpu->pc]);
     *reg = ram[cpu->sp];
 
     if (cpu->sp < (RAM_SZ - 1)) {
@@ -162,14 +230,14 @@ int popr(cpu_t *cpu, int *ram) {
 // ===============================================
 
 int equ(cpu_t *cpu, int *ram) {
-	int val = ram[++cpu->pc];
-	int *reg = get_register(ram[++cpu->pc]);
+    int val = ram[++cpu->pc];
+    int *reg = get_register(ram[++cpu->pc]);
 
-	cpu->flgs.cmp = (val == *reg);
-	return 1;
+    cpu->flgs.cmp = (val == *reg);
+    return 1;
 }
 
 int vexit(cpu_t *cpu, int *ram) {
-	return 0;
+    return 0;
 }
 

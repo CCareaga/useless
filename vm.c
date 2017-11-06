@@ -41,6 +41,7 @@ void dump_stack(cpu_t *c) {
     }
     printf("=======================\n\n");
 }
+
 // print the program counter and registers
 void dump_cpu() {
 
@@ -77,7 +78,7 @@ void vm_execute(executable_t *e) {
         // dump_stack(cpu);
 
         op = ram[cpu->pc];
-		running = operations[op].func(cpu, ram);
+        running = operations[op].func(cpu, ram);
         cpu->pc++;
         // getchar();
     }

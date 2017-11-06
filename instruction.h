@@ -4,8 +4,18 @@
 #include "vm.h"
 
 int nop(cpu_t *cpu, int *ram);
-int add(cpu_t *cpu, int *ram);
-int sub(cpu_t *cpu, int *ram);
+
+int addr(cpu_t *cpu, int *ram);
+int subr(cpu_t *cpu, int *ram);
+int mulr(cpu_t *cpu, int *ram);
+int divr(cpu_t *cpu, int *ram);
+int modr(cpu_t *cpu, int *ram);
+
+int addl(cpu_t *cpu, int *ram);
+int subl(cpu_t *cpu, int *ram);
+int mull(cpu_t *cpu, int *ram);
+int divl(cpu_t *cpu, int *ram);
+int modl(cpu_t *cpu, int *ram);
 
 int storr(cpu_t *cpu, int *ram);
 int storl(cpu_t *cpu, int *ram);

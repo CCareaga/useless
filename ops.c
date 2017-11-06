@@ -5,9 +5,17 @@
 #include "vm.h"
 
 op_t operations[] = {
-	{0, "NOP", nop},
-    {2, "ADD", add},
-    {2, "SUB", sub},
+    {0, "NOP", nop},
+    {2, "ADDR", addr},
+    {2, "SUBR", subr},
+    {2, "MULR", mulr},
+    {2, "DIVR", divr},
+    {2, "MODR", modr},
+    {2, "ADDL", addl},
+    {2, "SUBL", subl},
+    {2, "MULL", mull},
+    {2, "DIVL", divl},
+    {2, "MODL", modr},
     {0, "EXIT", vexit},
     {2, "STORR", storr},
     {2, "STORL", storl},
