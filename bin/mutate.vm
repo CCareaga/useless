@@ -6,9 +6,9 @@ STORR 96 A
 ~ on the second run of the loop we decrement and then exit the program
 
 $loop
-    ADD 1 A
+    ADDR 1 A
     PRINTR A
-    EQ 100 A
+    EQR 100 A
     LHOPT mutate
     LHOP loop
 
@@ -16,7 +16,7 @@ $mutate
     PRINTL newline
     STORL 2 loop
     STORR 104 A
-    STORL 3 mutate
+    STORL 50 mutate
     LHOP loop
 
 $newline 10

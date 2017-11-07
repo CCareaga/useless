@@ -6,6 +6,7 @@
 
 op_t operations[] = {
     {0, "NOP", nop},
+    // MATH
     {2, "ADDR", addr},
     {2, "SUBR", subr},
     {2, "MULR", mulr},
@@ -16,25 +17,68 @@ op_t operations[] = {
     {2, "MULL", mull},
     {2, "DIVL", divl},
     {2, "MODL", modr},
-    {0, "EXIT", vexit},
+    {2, "ADDLR", addlr},
+    {2, "SUBLR", sublr},
+    {2, "MULLR", mullr},
+    {2, "DIVLR", divlr},
+    {2, "MODLR", modlr},
+    {2, "ADDRL", addrl},
+    {2, "SUBRL", subrl},
+    {2, "MULRL", mulrl},
+    {2, "DIVRL", divrl},
+    {2, "MODRL", modrl},
+
+    // COMPARISON
+    {2, "EQR", eqr},
+    {2, "NEQR", neqr},
+    {2, "LTR", ltr},
+    {2, "LTER", lter},
+    {2, "GTR", gtr},
+    {2, "GTER", gter},
+
+    {2, "EQL", eql},
+    {2, "NEQL", neql},
+    {2, "LTL", ltl},
+    {2, "LTEL", ltel},
+    {2, "GTL", gtl},
+    {2, "GTEL", gtel},
+
+    {2, "EQLR", eqlr},
+    {2, "NEQLR", neqlr},
+    {2, "LTLR", ltlr},
+    {2, "LTELR", ltelr},
+    {2, "GTLR", gtlr},
+    {2, "GTELR", gtelr},
+
+    // STORAGE, MOVE, DEREFERNCE
     {2, "STORR", storr},
     {2, "STORL", storl},
+
     {2, "MVRL", mvrl},
     {2, "MVLR", mvlr},
     {2, "MVRR", mvrr},
     {2, "MVLL", mvll},
+
     {2, "DREFR", drefr},
     {2, "DREFL", drefl},
+
+    // BRANCH
     {1, "LHOP", lhop},
     {1, "LHOPT", lhopt},
     {1, "LHOPF", lhopf},
+
+    // PRINT
     {1, "PRINTR", printr},
     {1, "PRINTL", printl},
+
+    // STACK
     {1, "PUSH", push},
     {1, "PUSHR", pushr},
+    {1, "PUSHL", pushl},
     {0, "POP", pop},
     {1, "POPR", popr},
-    {2, "EQ", equ}
+    {1, "POPL", popl},
+    {0, "EXIT", vexit}
 };
 
 rcode_t registers[] = {

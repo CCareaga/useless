@@ -11,11 +11,11 @@ $loop
     MVRR A B
     DREFR B B
 
-    EQ 0 B
+    EQR 0 B
     LHOPT end
 
     PRINTR B
-    ADD 1 A
+    ADDR 1 A
     LHOP loop
 
 $end

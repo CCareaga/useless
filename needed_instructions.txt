@@ -2,14 +2,14 @@ instructions to make useless usable:
 
 math:
     4 flavors: 
-        R  - operand 1 is a literal, operand 2 is a register
-        L  - operand 1 is a literal, operand 2 is a label
-        RL - operand 1 is a register, operand 2 is a label
-        LR - operand 1 is a label, operand 2 is a register
+        R  - operand 1 is a literal, operand 2 is a register [x]
+        L  - operand 1 is a literal, operand 2 is a label [x]
+        RL - operand 1 is a register, operand 2 is a label [x]
+        LR - operand 1 is a label, operand 2 is a register [x]
     
     NOTE: resulting values are stored in operand 2
     
-    one of the followinf for each flavor:
+    one of the following for each flavor:
         ADD - add operand 1 to value in operand 2
         SUB - subtract operand 1 from value in operand 2
         MUL - multiply operand 1 by value in operand 2
@@ -18,9 +18,9 @@ math:
 
 conditionals:
     3 flavors:
-        R  - compare literal to register
-        L  - compare literal to a label
-        RL - compare register to label
+        R  - compare literal to register [x]
+        L  - compare literal to a label [x]
+        RL - compare register to label [x]
     
     one of the following for each flavor:
         EQ   - are the operands equal
@@ -33,18 +33,18 @@ conditionals:
 storage and loading:
     
     dereferencing:
-        DREFR - dereference register and store result in register
-        DREFL - dereference register and store result in a label
+        DREFR - dereference register and store result in register [x]
+        DREFL - dereference register and store result in a label [x]
 
     moving:
-        MVRL - move value from register to label
-        MVLR - move value from label to register
-        MVRR - move value from register to  register
-        MVLL - move value from label to label
+        MVRL - move value from register to label [x]
+        MVLR - move value from label to register [x]
+        MVRR - move value from register to  register [x]
+        MVLL - move value from label to label [x]
 
     store:
-        STORER - store literal in register
-        STOREL - store literal at label
+        STORER - store literal in register [x]
+        STOREL - store literal at label [x]
 
 conditional hops:
     HOPT - hop if last comparison was true [x]
