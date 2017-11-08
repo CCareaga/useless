@@ -7,6 +7,13 @@
 op_t operations[] = {
     {0, "NOP", nop},
     // MATH
+    // vanilla
+    {2, "ADD", NULL},
+    {2, "SUB", NULL},
+    {2, "MUL", NULL},
+    {2, "DIV", NULL},
+    {2, "MOD", NULL},
+
     {2, "ADDR", addr},
     {2, "SUBR", subr},
     {2, "MULR", mulr},
@@ -29,6 +36,15 @@ op_t operations[] = {
     {2, "MODRL", modrl},
 
     // COMPARISON
+
+    // vanilla
+    {2, "EQ", NULL},
+    {2, "NEQ", NULL},
+    {2, "LT", NULL},
+    {2, "LTE", NULL},
+    {2, "GT", NULL},
+    {2, "GTE", NULL},
+
     {2, "EQR", eqr},
     {2, "NEQR", neqr},
     {2, "LTR", ltr},
@@ -51,23 +67,33 @@ op_t operations[] = {
     {2, "GTELR", gtelr},
 
     // STORAGE, MOVE, DEREFERNCE
+    {2, "STOR", NULL},
     {2, "STORR", storr},
     {2, "STORL", storl},
+    {2, "STORLR", storr},
 
+    {2, "MV", NULL},
+    {2, "MVR", storr},
+    {2, "MVL", storl},
     {2, "MVRL", mvrl},
     {2, "MVLR", mvlr},
     {2, "MVRR", mvrr},
     {2, "MVLL", mvll},
 
-    {2, "DREFR", drefr},
-    {2, "DREFL", drefl},
+    {2, "DREF", NULL},
+    {2, "DREFRR", drefr},
+    {2, "DREFLR", drefl},
 
     // BRANCH
-    {1, "LHOP", lhop},
-    {1, "LHOPT", lhopt},
-    {1, "LHOPF", lhopf},
+    {1, "HOP", NULL},
+    {1, "HOPT", NULL},
+    {1, "HOPF", NULL},
+    {1, "HOPL", lhop},
+    {1, "HOPTL", lhopt},
+    {1, "HOPFL", lhopf},
 
     // PRINT
+    {1, "PRINT", NULL},
     {1, "PRINTR", printr},
     {1, "PRINTL", printl},
 
@@ -78,7 +104,8 @@ op_t operations[] = {
     {0, "POP", pop},
     {1, "POPR", popr},
     {1, "POPL", popl},
-    {0, "EXIT", vexit}
+    {0, "EXIT", vexit},
+    {0, NULL, NULL}
 };
 
 rcode_t registers[] = {
@@ -89,6 +116,22 @@ rcode_t registers[] = {
     {"BP"}
 };
 
+op_t *is_instruction(char *word) {
+    int i = 0;
+
+    while (operations[i].op_str && strcmp(operations[i].op_str, word) != 0)
+        i++;
+
+    if (operations[i].op_str)
+        return &operations[i];
+    else 
+        return NULL;
+}
+
+int is_register(char *word) {
+    return (strlen(word) == 1 && *word >= 65 && *word <= 68);
+}
+
 // searches through the arrays of operations and registers to determine
 // the opcode for a given word. if no opcode is found via arrays, atoi is used
 int get_opcode(char *word) {
@@ -97,7 +140,7 @@ int get_opcode(char *word) {
     int i;
 
     for (i = 0; i < op_count; i++) {
-        if (strcmp(operations[i].op_str, word) == 0) {
+        if (operations[i].op_str && strcmp(operations[i].op_str, word) == 0) {
             return i;
         }
     }

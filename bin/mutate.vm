@@ -1,4 +1,4 @@
-STORR 96 A
+STOR 96 A
 
 ~ loop though characters until we get to 'd'
 ~ then hop to mutate, in mutate we change the SUB instruction to SUB
@@ -6,17 +6,17 @@ STORR 96 A
 ~ on the second run of the loop we decrement and then exit the program
 
 $loop
-    ADDR 1 A
-    PRINTR A
-    EQR 100 A
-    LHOPT mutate
-    LHOP loop
+    ADD 1 A
+    PRINT A
+    EQ 100 A
+    HOPT mutate
+    HOP loop
 
 $mutate
-    PRINTL newline
-    STORL 2 loop
-    STORR 104 A
-    STORL 50 mutate
-    LHOP loop
+    PRINT newline
+    STOR 7 loop
+    STOR 104 A
+    STOR 98 mutate
+    HOP loop
 
 $newline 10

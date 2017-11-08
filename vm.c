@@ -74,13 +74,13 @@ void vm_execute(executable_t *e) {
     int running = 1;
 
     while (running) {
-        // dump_cpu();
+        dump_cpu();
         // dump_stack(cpu);
 
         op = ram[cpu->pc];
         running = operations[op].func(cpu, ram);
         cpu->pc++;
-        // getchar();
+        getchar();
     }
 
     free(ram);

@@ -15,6 +15,8 @@ typedef struct {
 
 extern op_t operations[];
 
+op_t *is_instruction(char *word);
+int is_register(char *word);
 int get_opcode(char *word);
 
 #endif // _OPS_H

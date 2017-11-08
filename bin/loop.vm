@@ -1,32 +1,32 @@
-STORR 48 A
-STORR 32 B
-STORR 10 C
+STOR 48 A
+STOR 32 B
+STOR 10 C
 
 $loop
-    ADDR 1 A
+    ADD 1 A
 
-    PRINTR A
-    PRINTR B
+    PRINT A
+    PRINT B
 
-    EQR 57 A
-    LHOPT letters
-    LHOP loop
+    EQ 57 A
+    HOPT letters
+    HOP loop
 
 $letters
-    PRINTR C
-    STORR 64 A
+    PRINT C
+    STOR 64 A
     
 $loop2
-    ADDR 1 A
+    ADD 1 A
 
-    PRINTR A
-    PRINTR B
+    PRINT A
+    PRINT B
 
-    EQR 90 A
-    LHOPT end
-    LHOP loop2
+    EQ 90 A
+    HOPT end
+    HOP loop2
 
 $end
-    PRINTR C
+    PRINT C
     EXIT
     

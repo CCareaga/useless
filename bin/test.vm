@@ -1,18 +1,12 @@
-LHOP LABEL2
+STOR 3 A
+MV letter B
 
-$LABEL3
-    STORE 123 A
-    LHOP LABEL1
-
-$LABEL1
-    STORE 456 BP
-    LHOP LABEL4
-
-$LABEL2
-    STORE 789 C
-    LHOP LABEL3
-
-$LABEL4
+$lbl
     ADD 3 A
+    PRINT letter
+    ADD 3 B
+    PRINT B
     NOP
     EXIT
+
+$letter 65
