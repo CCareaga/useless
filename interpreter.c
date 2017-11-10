@@ -95,14 +95,15 @@ void encode(char *word, executable_t *exec) {
     exec->length += 1;
 }
 
-void preprocess(char **tokens, int len, executable_t *exec) {
-
+int preprocess(char **tokens, int len, executable_t *exec) {
+    int ret = 0;
     char *inst = tokens[0];
     op_t *op = is_instruction(inst);
 
     if (op) {
         int ilen = strlen(inst);
         char *new_inst = malloc(ilen + 2);
+        ret = 1;
         strcpy(new_inst, inst);
     
         int i;
@@ -120,6 +121,8 @@ void preprocess(char **tokens, int len, executable_t *exec) {
 
         tokens[0] = new_inst;
     }
+    
+    return ret;
 }
 
 // this parses a single line and depending on the pass number, translates
@@ -155,11 +158,12 @@ int assemble(char* line, executable_t *exec, int pass) {
     }
 
     tokens[op_ind] = NULL;
+    int mallocd = 0;
     
     if (tokens[0]) {
         if (pass == 2) {
             if (is_instruction(tokens[0])) {
-                preprocess(tokens, op_ind, exec);
+                mallocd = preprocess(tokens, op_ind, exec);
                 if (!is_instruction(tokens[0])) return 1;
             }
 
@@ -168,6 +172,8 @@ int assemble(char* line, executable_t *exec, int pass) {
                 encode(*temp, exec);
                 temp++;
             }
+
+            if (mallocd) free(tokens[0]);
         }
     }
 
