@@ -6,7 +6,9 @@
 
 op_t operations[] = {
     {0, "NOP", nop},
-    // MATH
+    
+    // MATH ==============
+
     // vanilla
     {2, "ADD", NULL},
     {2, "SUB", NULL},
@@ -34,8 +36,9 @@ op_t operations[] = {
     {2, "MULRL", mulrl},
     {2, "DIVRL", divrl},
     {2, "MODRL", modrl},
+    // ===================
 
-    // COMPARISON
+    // COMPARISON ========
 
     // vanilla
     {2, "EQ", NULL},
@@ -65,6 +68,7 @@ op_t operations[] = {
     {2, "LTELR", ltelr},
     {2, "GTLR", gtlr},
     {2, "GTELR", gtelr},
+    // ==================
 
     // STORAGE, MOVE, DEREFERNCE
     {2, "STOR", NULL},
@@ -83,21 +87,24 @@ op_t operations[] = {
     {2, "DREF", NULL},
     {2, "DREFRR", drefr},
     {2, "DREFLR", drefl},
+    // ==================
 
-    // BRANCH
+    // BRANCH ===========
     {1, "HOP", NULL},
     {1, "HOPT", NULL},
     {1, "HOPF", NULL},
     {1, "HOPL", lhop},
     {1, "HOPTL", lhopt},
     {1, "HOPFL", lhopf},
+    // ==================
 
-    // PRINT
+    // PRINT ============
     {1, "PRINT", NULL},
     {1, "PRINTR", printr},
     {1, "PRINTL", printl},
+    // ==================
 
-    // STACK
+    // STACK ============
     {1, "PUSH", push},
     {1, "PUSHR", pushr},
     {1, "PUSHL", pushl},
@@ -105,6 +112,7 @@ op_t operations[] = {
     {1, "POPR", popr},
     {1, "POPL", popl},
     {0, "EXIT", vexit},
+    // ==================
     {0, NULL, NULL}
 };
 
