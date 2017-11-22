@@ -1,11 +1,20 @@
-MV 0 A
-MV 0 B
-MV 0 C
+~ first we move the address of the string into A
+MV &word A
 
-MV &label A
-MV *A B
+~ in the loop we check for the char and exit if null, if not
+~ null we print the char add one to the char pointer and loop
 
-EXIT
+$loop
+    EQ 0 *A
+    HOPT exit
+    
+    PRINT *A
+    ADD 1 A
+    HOP loop
 
-$label 
-    777
+$exit
+    EXIT
+
+~ the string "I am useless"
+$word 
+    10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 

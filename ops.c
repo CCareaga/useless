@@ -8,40 +8,35 @@ op_t operations[] = {
     {0, "NOP", nop},
     
     // MATH ==============
-
-    // vanilla
-    {2, "ADD", NULL},
-    {2, "SUB", NULL},
-    {2, "MUL", NULL},
-    {2, "DIV", NULL},
-    {2, "MOD", NULL},
+    {2, "ADD", vadd},
+    {2, "SUB", vsub},
+    {2, "MUL", vmul},
+    {2, "DIV", vdiv},
+    {2, "MOD", vmod},
     // ===================
 
     // COMPARISON ========
-
-    // vanilla
-    {2, "EQ", NULL},
-    {2, "NEQ", NULL},
-    {2, "LT", NULL},
-    {2, "LTE", NULL},
-    {2, "GT", NULL},
-    {2, "GTE", NULL},
+    {2, "EQ", eq},
+    {2, "NEQ", neq},
+    {2, "LT", lt},
+    {2, "LTE", lte},
+    {2, "GT", gt},
+    {2, "GTE", gte},
     // ==================
 
     // STORAGE, MOVE, DEREFERNCE
     {2, "MV", mv},
-
-    {2, "DREF", dref},
+    {1, "DREF", dref},
     // ==================
 
     // BRANCH ===========
-    {1, "HOP", NULL},
-    {1, "HOPT", NULL},
-    {1, "HOPF", NULL},
+    {1, "HOP", hop},
+    {1, "HOPT", hopt},
+    {1, "HOPF", hopf},
     // ==================
 
     // PRINT ============
-    {1, "PRINT", NULL},
+    {1, "PRINT", print},
     // ==================
 
     // STACK ============
@@ -49,6 +44,7 @@ op_t operations[] = {
     {0, "POP", NULL},
     {0, "EXIT", vexit},
     // ==================
+
     {0, NULL, NULL}
 };
 

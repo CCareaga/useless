@@ -11,7 +11,7 @@ typedef struct {
 
 typedef struct {
     int pc; // program counter
-    flags_t flgs;
+    int flg; // comparison flag
 } cpu_t;
 
 typedef struct {

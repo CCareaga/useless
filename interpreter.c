@@ -11,7 +11,6 @@ enum regs {
     A = 1,
     B,
     C,
-    D,
     SP,
     BP
 };
@@ -19,8 +18,6 @@ enum regs {
 static int tok_start = BP;
 static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
-
-static int lbl_off = 0;
 
 
 // LABEL RELATED FUNCTIONS ================================================
@@ -60,7 +57,7 @@ void add_label(executable_t *exec, char *name, int addr) {
 
     char *lbl_name = strdup((++name));
     lbl->name = lbl_name;
-    lbl->address = addr + lbl_off;
+    lbl->address = addr;
 
     lnode_t *current = exec->labels;
 
@@ -100,12 +97,8 @@ int tokenize(executable_t *exec, char *line) {
                 
                 if (*start == '$') 
                     add_label(exec, start, tok_cnt + 1);   
-                else {
-                    if (*start == '*') 
-                        lbl_off += 2;
-
+                else 
                     tokens[tok_cnt++] = strdup(start); 
-                }
 
                 in_word = 0;
             }
@@ -117,33 +110,15 @@ int tokenize(executable_t *exec, char *line) {
     return 0;
 }
 
-void add_dereference(executable_t *exec, char *oper) {
-    char *dref = strdup("DREF");
-    
-    ++oper;
-
-    exec->code[exec->length++] = get_opcode(dref);
-    exec->code[exec->length++] = is_label(oper, exec);
-
-    free(dref);
-}
-
 // goes through the array of tokens, converts them to op code and places
 // them in the executable structure
 void process_inst(executable_t *exec, op_t *op, int *index) {
     int i = 0;
 
     int opcode;
-    int i_code;
+    int i_code = 0;
 
     char *operand;
-
-    for (i = 0; i < op->argc; i++) {
-        operand = tokens[(*index) + i];
-
-        if (operand[0] == '*') 
-            add_dereference(exec, operand);
-    }
 
     for (i = 0; i < op->argc; i++) {
         operand = tokens[(*index)++];
@@ -152,7 +127,7 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
         
         if (operand[0] == '*') {
             i_code |= R << (i * 4);
-            opcode = D;
+            opcode = is_label(operand + 1, exec);
         }
 
         else if (operand[0] == '&') {
@@ -170,14 +145,12 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
             opcode = atoi(operand);
         }
 
-
         printf("STR: %s -> OP: %d     ADDR: %d \n", operand, opcode, exec->length + i + 1);
         exec->code[exec->length + i + 1] = opcode;
         free(operand);
     }
 
-
-    printf("STR: %s -> OP: %d     ADDR: %d \n", op->op_str, (i_code << 16) | get_opcode(op->op_str), exec->length);
+    printf("STR: %s -> OP: %d     ADDR: %d \n", op->op_str, get_opcode(op->op_str), exec->length);
     exec->code[exec->length++] = (i_code << 16) | get_opcode(op->op_str);
     exec->length += i;
 }
@@ -196,7 +169,7 @@ int assemble(executable_t *exec) {
             process_inst(exec, op, &index);
         }
         else {
-            printf("literal value: %d \n", atoi(tok));
+            printf("literal value: %d  stored at: %d \n", atoi(tok), exec->length);
             exec->code[exec->length++] = atoi(tok);
         }
     }
@@ -212,16 +185,15 @@ executable_t *vm_load(char *fn) {
     executable_t *exec = malloc(sizeof(executable_t));
 
     exec->code = malloc(RAM_SZ);
-    exec->entry  = 7;
+    exec->entry  = 6;
 
     add_label(exec, "$A",  A);
     add_label(exec, "$B",  B);
     add_label(exec, "$C",  C);
-    add_label(exec, "$D",  D);
     add_label(exec, "$SP", SP);
     add_label(exec, "$BP", BP);
 
-    exec->length = 7;
+    exec->length = 6;
 
     fp = fopen(fn, "r");
     if (!fp) return NULL;

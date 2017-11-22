@@ -26,10 +26,9 @@ void dump_cpu() {
     printf("A: %d \n", ram[1]);
     printf("B: %d \n", ram[2]);
     printf("C: %d \n", ram[3]);
-    printf("D: %d \n", ram[4]);
 
     printf("PC: %d \n", cpu->pc);
-    printf("OP: %d \n", (uint16_t) ram[cpu->pc]);
+    printf("OP: %s \n", operations[(uint16_t) ram[cpu->pc]].op_str);
     printf("========================\n\n");
 }
 
@@ -49,7 +48,7 @@ void vm_execute(executable_t *e) {
     int running = 1;
 
     while (running) {
-        dump_cpu();
+        // dump_cpu();
         // dump_stack(cpu);
 
         opcode = ram[cpu->pc];
@@ -59,7 +58,7 @@ void vm_execute(executable_t *e) {
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;
 
-        getchar();
+        // getchar();
     }
 
     free(ram);
