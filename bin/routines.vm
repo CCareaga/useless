@@ -1,0 +1,33 @@
+MV 4 A
+MV 8 B
+MV 123 C
+
+CALL mul_numbers
+
+EXIT
+
+~ muliply the numbers in A and B, result in D
+$mul_numbers
+    PUSH C
+    MV 0 C
+
+    $loop
+        ADD 1 C
+        CALL add_numbers
+        EQ C A
+        HOPF loop
+       
+    POP C
+    RET
+
+~ add the numbers in A and B result in D
+$add_numbers 
+    PUSH A
+    PUSH B
+    
+    ADD B D
+
+    POP B
+    POP A
+
+    RET

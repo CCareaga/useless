@@ -42,8 +42,15 @@ op_t operations[] = {
     // STACK ============
     {1, "PUSH", push},
     {1, "POP", pop},
-    {0, "EXIT", vexit},
     // ==================
+
+    // ROUTINES =========
+    
+    {1, "CALL", call},
+    {0, "RET", ret},
+    // ==================
+
+    {0, "EXIT", vexit},
 
     {0, NULL, NULL}
 };

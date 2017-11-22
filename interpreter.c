@@ -7,14 +7,6 @@
 #include <string.h>
 #include <ctype.h>
 
-enum regs {
-    A = 1,
-    B,
-    C,
-    SP,
-    BP
-};
-
 static int tok_start = BP;
 static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
@@ -155,8 +147,7 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
     exec->length += i;
 }
 
-// this function goes through the token array changes instructions according
-// to the operands, changes labels and registers to opcodes
+// this function goes through the token array and processes instructions
 int assemble(executable_t *exec) {
     int index = tok_start;
 
@@ -169,9 +160,10 @@ int assemble(executable_t *exec) {
             process_inst(exec, op, &index);
         }
         else {
-            printf("literal value: %d  stored at: %d \n", atoi(tok), exec->length);
             exec->code[exec->length++] = atoi(tok);
         }
+
+        free(tok);
     }
 }
 
@@ -185,15 +177,17 @@ executable_t *vm_load(char *fn) {
     executable_t *exec = malloc(sizeof(executable_t));
 
     exec->code = malloc(RAM_SZ);
-    exec->entry  = 6;
 
     add_label(exec, "$A",  A);
     add_label(exec, "$B",  B);
     add_label(exec, "$C",  C);
+    add_label(exec, "$D",  D);
+    add_label(exec, "$E",  E);
     add_label(exec, "$SP", SP);
     add_label(exec, "$BP", BP);
 
-    exec->length = 6;
+    exec->length = BP + 1;
+    exec->entry  = BP + 1;
 
     fp = fopen(fn, "r");
     if (!fp) return NULL;

@@ -21,6 +21,17 @@ enum operands {
     R = 0x4,
 };
 
+enum regs {
+    A = 1,
+    B,
+    C,
+    D,
+    E,
+    SP,
+    BP
+};
+
+
 op_t *is_instruction(char *word);
 int is_register(char *word); int get_opcode(const char *word);
 

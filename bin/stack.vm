@@ -3,11 +3,13 @@ MV 456 B
 
 PUSH *A
 PUSH B
-PUSH 789
+PUSH 65
 
 POP *A
 POP B
 POP 0
+
+PRINT label
 
 EXIT
 

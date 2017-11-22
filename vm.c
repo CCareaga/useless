@@ -9,13 +9,16 @@ static int *ram;
 static cpu_t *cpu;
 
 void dump_stack(cpu_t *c) {
-    int i = ram[4];
+    int i = ram[SP];
 
     printf("======== STACK ========\n");
     while (i < RAM_SZ) {
         printf("%d: %d\n", i, ram[i]);
         i++;
     }
+
+    printf("\nSP: %d \n", ram[SP]);
+    printf("BP: %d \n", ram[BP]);
     printf("=======================\n\n");
 }
 
@@ -23,9 +26,11 @@ void dump_stack(cpu_t *c) {
 void dump_cpu() {
 
     printf("========= CPU ==========\n");
-    printf("A: %d \n", ram[1]);
-    printf("B: %d \n", ram[2]);
-    printf("C: %d \n", ram[3]);
+    printf("A: %d \n", ram[A]);
+    printf("B: %d \n", ram[B]);
+    printf("C: %d \n", ram[C]);
+    printf("D: %d \n", ram[D]);
+    printf("E: %d \n", ram[E]);
 
     printf("PC: %d \n", cpu->pc);
     printf("OP: %s \n", operations[(uint16_t) ram[cpu->pc]].op_str);
@@ -43,8 +48,8 @@ void vm_execute(executable_t *e) {
     memcpy(ram, e->code, (e->length * sizeof(int)));
     cpu->pc = e->entry;
 
-    ram[4] = RAM_SZ;
-    ram[5] = RAM_SZ;
+    ram[SP] = RAM_SZ;
+    ram[BP] = RAM_SZ;
 
     int opcode;
     uint16_t operation, operands;

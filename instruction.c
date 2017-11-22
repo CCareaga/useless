@@ -542,19 +542,19 @@ int push(cpu_t *cpu, int *ram, uint16_t type) {
 
     int val = ram[++cpu->pc]; 
 
-    ram[4] -= 1;
+    ram[SP] -= 1;
 
     switch (type) {
         case (ocode(L, 0, 0, 0)):
-            ram[ram[4]] = val;
+            ram[ram[SP]] = val;
             break;
 
         case (ocode(M, 0, 0, 0)):
-            ram[ram[4]] = ram[val];
+            ram[ram[SP]] = ram[val];
             break;
 
         case (ocode(R, 0, 0, 0)):
-            ram[ram[4]] = ram[ram[val]];
+            ram[ram[SP]] = ram[ram[val]];
             break;
         
         default:
@@ -567,24 +567,59 @@ int push(cpu_t *cpu, int *ram, uint16_t type) {
 int pop(cpu_t *cpu, int *ram, uint16_t type) {
 
     int val = ram[++cpu->pc]; 
-
+    
     switch (type) {
         case (ocode(L, 0, 0, 0)):
             break; 
 
         case (ocode(M, 0, 0, 0)):
-            ram[val] = ram[ram[4]];
+            ram[val] = ram[ram[SP]];
             break;
 
         case (ocode(R, 0, 0, 0)):
-            ram[ram[val]] = ram[ram[4]];
+            ram[ram[val]] = ram[ram[SP]];
             break;
         
         default:
             return 0;
     }
     
-    ram[4] += 1;
+    ram[SP] += 1;
+    return 1;
+}
+
+int call(cpu_t *cpu, int *ram, uint16_t type) {
+    int val = ram[++cpu->pc]; 
+
+    ram[SP] -= 1;
+    ram[ram[SP]] = cpu->pc + 1;
+
+    ram[SP] -= 1;
+    ram[ram[SP]] = ram[BP];
+
+    ram[BP] = ram[SP];
+
+    switch (type) {
+        case (ocode(M, 0, 0, 0)):
+            cpu->pc = val - 1;
+            break;
+        
+        default:
+            return 0;
+    }
+
+    return 1;
+}
+
+int ret(cpu_t *cpu, int *ram, uint16_t type) {
+    int old_bp = ram[ram[BP]];
+    int r_addr = ram[ram[BP] + 1];
+
+    ram[BP] = old_bp;
+    ram[SP] = old_bp - 1;
+
+    cpu->pc = r_addr - 1;
+
     return 1;
 }
 

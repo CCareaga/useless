@@ -33,6 +33,10 @@ int lte(cpu_t *cpu, int *ram, uint16_t type);
 int gt(cpu_t *cpu, int *ram, uint16_t type);
 int gte(cpu_t *cpu, int *ram, uint16_t type);
 
+
+int call(cpu_t *cpu, int *ram, uint16_t type);
+int ret(cpu_t *cpu, int *ram, uint16_t type);
+
 int vexit(cpu_t *cpu, int *ram, uint16_t type);
 
 #endif
