@@ -7,16 +7,32 @@
 #include <string.h>
 #include <ctype.h>
 
+enum regs {
+    A = 1,
+    B,
+    C,
+    D,
+    SP,
+    BP
+};
+
+static int tok_start = BP;
 static char *tokens[RAM_SZ];
-static int tok_cnt = 0;
+static int tok_cnt = BP;
+
+static int lbl_off = 0;
+
 
 // LABEL RELATED FUNCTIONS ================================================
 // print out the labels in an executable.
-void dump_labels(executable_t *exec) {
-
+void increment_labels(executable_t *exec, int len, int inc) {
+    
     lnode_t *cur = exec->labels;
     while (cur) {
-        printf("lbl: %s -> addr: %d \n", cur->name, cur->address);
+        if (cur->address >= len) {
+            cur->address += inc;
+        }
+
         cur = cur->next;
     }
 
@@ -44,7 +60,7 @@ void add_label(executable_t *exec, char *name, int addr) {
 
     char *lbl_name = strdup((++name));
     lbl->name = lbl_name;
-    lbl->address = addr;
+    lbl->address = addr + lbl_off;
 
     lnode_t *current = exec->labels;
 
@@ -81,11 +97,15 @@ int tokenize(executable_t *exec, char *line) {
         else {
             if (isspace(*line)) {
                 *line = '\0';
-
+                
                 if (*start == '$') 
                     add_label(exec, start, tok_cnt + 1);   
-                else
+                else {
+                    if (*start == '*') 
+                        lbl_off += 2;
+
                     tokens[tok_cnt++] = strdup(start); 
+                }
 
                 in_word = 0;
             }
@@ -97,50 +117,75 @@ int tokenize(executable_t *exec, char *line) {
     return 0;
 }
 
+void add_dereference(executable_t *exec, char *oper) {
+    char *dref = strdup("DREF");
+    
+    ++oper;
+
+    exec->code[exec->length++] = get_opcode(dref);
+    exec->code[exec->length++] = is_label(oper, exec);
+
+    free(dref);
+}
+
 // goes through the array of tokens, converts them to op code and places
 // them in the executable structure
 void process_inst(executable_t *exec, op_t *op, int *index) {
     int i = 0;
-    int opcode;
 
-    int ilen = strlen(op->op_str);
-    char *new_inst = malloc(ilen + 2);
-    strcpy(new_inst, op->op_str);
+    int opcode;
+    int i_code;
+
+    char *operand;
 
     for (i = 0; i < op->argc; i++) {
-        char *operand = tokens[(*index)++];
-        int lbl = is_label(operand, exec);
+        operand = tokens[(*index) + i];
 
-        if (lbl) {
-            new_inst[ilen++] = 'L';
+        if (operand[0] == '*') 
+            add_dereference(exec, operand);
+    }
+
+    for (i = 0; i < op->argc; i++) {
+        operand = tokens[(*index)++];
+
+        int lbl = is_label(operand, exec);
+        
+        if (operand[0] == '*') {
+            i_code |= R << (i * 4);
+            opcode = D;
+        }
+
+        else if (operand[0] == '&') {
+            i_code |= L << (i * 4);
+            opcode = is_label(operand + 1, exec);
+        }
+
+        else if (lbl) {
+            i_code |= M << (i * 4);
             opcode = lbl;
         }
 
-        else if (is_register(operand)) {
-            new_inst[ilen++] = 'R';
-            opcode = get_opcode(operand);
+        else {
+            i_code |= L << (i * 4);
+            opcode = atoi(operand);
         }
 
-        else 
-            opcode = atoi(operand);
 
+        printf("STR: %s -> OP: %d     ADDR: %d \n", operand, opcode, exec->length + i + 1);
         exec->code[exec->length + i + 1] = opcode;
         free(operand);
     }
 
-    new_inst[ilen] = 0;
 
-    exec->code[exec->length++] = get_opcode(new_inst);
+    printf("STR: %s -> OP: %d     ADDR: %d \n", op->op_str, (i_code << 16) | get_opcode(op->op_str), exec->length);
+    exec->code[exec->length++] = (i_code << 16) | get_opcode(op->op_str);
     exec->length += i;
-    free(new_inst);
 }
 
 // this function goes through the token array changes instructions according
 // to the operands, changes labels and registers to opcodes
-// eventually there will be four cases of operands here
-// *L, *R, L, D and literal
 int assemble(executable_t *exec) {
-    int index = 0;
+    int index = tok_start;
 
     while (index < tok_cnt) {
         char *tok = tokens[index++];
@@ -150,8 +195,8 @@ int assemble(executable_t *exec) {
         if (op) {
             process_inst(exec, op, &index);
         }
-
         else {
+            printf("literal value: %d \n", atoi(tok));
             exec->code[exec->length++] = atoi(tok);
         }
     }
@@ -167,8 +212,16 @@ executable_t *vm_load(char *fn) {
     executable_t *exec = malloc(sizeof(executable_t));
 
     exec->code = malloc(RAM_SZ);
-    exec->entry  = 1;
-    exec->length = 1;
+    exec->entry  = 7;
+
+    add_label(exec, "$A",  A);
+    add_label(exec, "$B",  B);
+    add_label(exec, "$C",  C);
+    add_label(exec, "$D",  D);
+    add_label(exec, "$SP", SP);
+    add_label(exec, "$BP", BP);
+
+    exec->length = 7;
 
     fp = fopen(fn, "r");
     if (!fp) return NULL;

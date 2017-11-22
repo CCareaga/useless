@@ -11,14 +11,6 @@ typedef struct {
 
 typedef struct {
     int pc; // program counter
-
-    int sp; // stack pointer
-    int bp; // base pointer
-
-    int a;  // reg a
-    int b;  // reg b
-    int c;  // reg c
-
     flags_t flgs;
 } cpu_t;
 
@@ -28,6 +20,5 @@ typedef struct {
 } vm_t;
 
 void vm_execute(executable_t *e);
-int *get_register(int code);
 
 #endif // _VM_H

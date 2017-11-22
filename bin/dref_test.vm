@@ -1,0 +1,11 @@
+MV 0 A
+MV 0 B
+MV 0 C
+
+MV &label A
+MV *A B
+
+EXIT
+
+$label 
+    777
