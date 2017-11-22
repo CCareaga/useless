@@ -9,7 +9,7 @@ static int *ram;
 static cpu_t *cpu;
 
 void dump_stack(cpu_t *c) {
-    int i = 0;
+    int i = ram[4];
 
     printf("======== STACK ========\n");
     while (i < RAM_SZ) {
@@ -39,17 +39,20 @@ void vm_execute(executable_t *e) {
 
     memset(ram, 0, RAM_SZ);
     memset(cpu, 0, sizeof(cpu_t));
-    
+     
     memcpy(ram, e->code, (e->length * sizeof(int)));
     cpu->pc = e->entry;
+
+    ram[4] = RAM_SZ;
+    ram[5] = RAM_SZ;
 
     int opcode;
     uint16_t operation, operands;
     int running = 1;
 
     while (running) {
-        // dump_cpu();
-        // dump_stack(cpu);
+        dump_cpu();
+        dump_stack(cpu);
 
         opcode = ram[cpu->pc];
         operation = (uint16_t) opcode;
@@ -58,7 +61,7 @@ void vm_execute(executable_t *e) {
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;
 
-        // getchar();
+        getchar();
     }
 
     free(ram);

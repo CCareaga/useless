@@ -1,20 +1,47 @@
-~ first we move the address of the string into A
-MV &word A
+MV &src A
+ADD 6 A
 
-~ in the loop we check for the char and exit if null, if not
-~ null we print the char add one to the char pointer and loop
+MV &dest B
+MV 10 *B
+ADD 1 B
 
-$loop
+$cpy
     EQ 0 *A
-    HOPT exit
+    HOPT print
+
+    MV *A *B
+    ADD 1 A
+    ADD 1 B
+
+    HOP cpy
+
+$print
+    MV &src A
+    MV &dest B
+
+$loopa
+    EQ 0 *A
+    HOPT loopb
     
     PRINT *A
     ADD 1 A
-    HOP loop
+    HOP loopa
+
+$loopb
+    EQ 0 *B
+    HOPT exit
+    
+    PRINT *B
+    ADD 1 B
+    HOP loopb
 
 $exit
     EXIT
 
 ~ the string "I am useless"
-$word 
+$src
     10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 
+
+$dest
+    0  0  0  0  0   0  0   0   0   0   0   0   0   0  0
+

@@ -12,9 +12,6 @@ int nop(cpu_t *cpu, int *ram, uint16_t type) {
 }
 
 int dref(cpu_t *cpu, int *ram, uint16_t type) {
-    int val = ram[++cpu->pc]; 
-    printf("VAL = %d \n", val);
-    ram[4] = ram[ram[val]];
     return 1;
 }
 
@@ -538,6 +535,56 @@ int print(cpu_t *cpu, int *ram, uint16_t type) {
             return 0;
     }
 
+    return 1;
+}
+
+int push(cpu_t *cpu, int *ram, uint16_t type) {
+
+    int val = ram[++cpu->pc]; 
+
+    ram[4] -= 1;
+
+    switch (type) {
+        case (ocode(L, 0, 0, 0)):
+            ram[ram[4]] = val;
+            break;
+
+        case (ocode(M, 0, 0, 0)):
+            ram[ram[4]] = ram[val];
+            break;
+
+        case (ocode(R, 0, 0, 0)):
+            ram[ram[4]] = ram[ram[val]];
+            break;
+        
+        default:
+            return 0;
+    }
+    
+    return 1;
+}
+
+int pop(cpu_t *cpu, int *ram, uint16_t type) {
+
+    int val = ram[++cpu->pc]; 
+
+    switch (type) {
+        case (ocode(L, 0, 0, 0)):
+            break; 
+
+        case (ocode(M, 0, 0, 0)):
+            ram[val] = ram[ram[4]];
+            break;
+
+        case (ocode(R, 0, 0, 0)):
+            ram[ram[val]] = ram[ram[4]];
+            break;
+        
+        default:
+            return 0;
+    }
+    
+    ram[4] += 1;
     return 1;
 }
 

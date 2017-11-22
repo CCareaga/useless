@@ -40,8 +40,8 @@ op_t operations[] = {
     // ==================
 
     // STACK ============
-    {1, "PUSH", NULL},
-    {0, "POP", NULL},
+    {1, "PUSH", push},
+    {1, "POP", pop},
     {0, "EXIT", vexit},
     // ==================
 
