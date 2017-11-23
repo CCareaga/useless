@@ -56,8 +56,8 @@ void vm_execute(executable_t *e) {
     int running = 1;
 
     while (running) {
-        dump_cpu();
-        dump_stack(cpu);
+        // dump_cpu();
+        // dump_stack(cpu);
 
         opcode = ram[cpu->pc];
         operation = (uint16_t) opcode;
@@ -66,7 +66,7 @@ void vm_execute(executable_t *e) {
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;
 
-        getchar();
+        // getchar();
     }
 
     free(ram);

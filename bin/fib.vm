@@ -1,0 +1,59 @@
+MV 40 A
+CALL print_fib
+PRINT 10
+
+EXIT
+
+~ print N fib numbers, N stored in A
+$print_fib
+    PUSH C
+
+    MV 1 C
+
+    $print_loop
+        PUSH A
+
+        MV C A
+        CALL fib
+        PRINTN B
+        PRINT 32
+
+        POP A
+        ADD 1 C
+
+        LTE A C
+        HOPT print_loop
+
+    POP C
+    RET
+
+~ take N from A and place fib(N) in B
+$fib
+    PUSH A              ~ save N
+
+    LTE 1 A             ~ if N is greater than 1 we jump to recursion
+    HOPF call_rec
+
+    MV A B              ~ N is 1 or 0 so we place it in B (return reg)
+    POP A               ~ grab A off the stack and return
+    RET
+
+$call_rec
+    CALL recurse        ~ start the recursion
+    RET
+
+$recurse
+    PUSH A              ~ save A
+    SUB 1 A             ~ sub 1 from A and call fib 
+    CALL fib
+    PUSH B              ~ push the result
+
+    SUB 1 A             ~ sub 1 again and call fib
+    CALL fib
+
+    POP A               ~ grab first result fib(n - 1) from stack
+    ADD A B             ~ add it to the second result
+
+    POP A               ~ now pop N back into A and return
+    RET
+

@@ -1,0 +1,40 @@
+MV &src A
+
+CALL print_string
+CALL print_reverse
+
+EXIT
+
+~ print string stored in A
+$print_string
+    PUSH A
+
+    $loop
+        EQ 0 *A
+        HOPT str_ret
+        
+        ADD 1 A
+        PRINT *A
+        HOP loop
+
+    $str_ret
+        POP A
+        RET
+
+$print_reverse
+    PUSH A
+
+    EQ 0 *A
+    HOPT rev_ret
+    
+    ADD 1 A
+    CALL print_reverse
+    PRINT *A 
+
+    $rev_ret
+        POP A
+        SUB 1 A
+        RET
+
+$src
+    10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 

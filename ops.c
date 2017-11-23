@@ -37,6 +37,7 @@ op_t operations[] = {
 
     // PRINT ============
     {1, "PRINT", print},
+    {1, "PRINTN", printn},
     // ==================
 
     // STACK ============

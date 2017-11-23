@@ -22,6 +22,7 @@ int hopt(cpu_t *cpu, int *ram, uint16_t type);
 int hopf(cpu_t *cpu, int *ram, uint16_t type);
 
 int print(cpu_t *cpu, int *ram, uint16_t type);
+int printn(cpu_t *cpu, int *ram, uint16_t type);
 
 int push(cpu_t *cpu, int *ram, uint16_t type);
 int pop(cpu_t *cpu, int *ram, uint16_t type);

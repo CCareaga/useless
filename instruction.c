@@ -515,6 +515,29 @@ int hop(cpu_t *cpu, int *ram, uint16_t type) {
     return 1;
 }
 
+int printn(cpu_t *cpu, int *ram, uint16_t type) {
+    int val = ram[++cpu->pc]; 
+
+    switch (type) {
+        case (ocode(L, 0, 0, 0)):
+            printf("%d", val);
+            break;
+
+        case (ocode(M, 0, 0, 0)):
+            printf("%d", ram[val]);
+            break;
+
+        case (ocode(R, 0, 0, 0)):
+            printf("%d", ram[ram[val]]);
+            break;
+        
+        default:
+            return 0;
+    }
+
+    return 1;
+}
+
 int print(cpu_t *cpu, int *ram, uint16_t type) {
     int val = ram[++cpu->pc]; 
 
@@ -615,11 +638,10 @@ int ret(cpu_t *cpu, int *ram, uint16_t type) {
     int old_bp = ram[ram[BP]];
     int r_addr = ram[ram[BP] + 1];
 
+    ram[SP] = ram[BP] + 2;
     ram[BP] = old_bp;
-    ram[SP] = old_bp - 1;
 
     cpu->pc = r_addr - 1;
-
     return 1;
 }
 
