@@ -1,0 +1,15 @@
+
+$print_word
+    PUSH A
+
+    $loop
+        EQ 0 *A
+        HOPT str_ret
+        
+        ADD 1 A
+        PRINT *A
+        HOP loop
+
+    $str_ret
+        POP A
+        RET

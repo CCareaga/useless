@@ -15,8 +15,6 @@ int vmod(cpu_t *cpu, int *ram, uint16_t type);
 
 int mv(cpu_t *cpu, int *ram, uint16_t type);
 
-int dref(cpu_t *cpu, int *ram, uint16_t type);
-
 int hop(cpu_t *cpu, int *ram, uint16_t type);
 int hopt(cpu_t *cpu, int *ram, uint16_t type);
 int hopf(cpu_t *cpu, int *ram, uint16_t type);
@@ -33,7 +31,6 @@ int lt(cpu_t *cpu, int *ram, uint16_t type);
 int lte(cpu_t *cpu, int *ram, uint16_t type);
 int gt(cpu_t *cpu, int *ram, uint16_t type);
 int gte(cpu_t *cpu, int *ram, uint16_t type);
-
 
 int call(cpu_t *cpu, int *ram, uint16_t type);
 int ret(cpu_t *cpu, int *ram, uint16_t type);

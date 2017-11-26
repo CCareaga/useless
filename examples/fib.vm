@@ -1,6 +1,6 @@
-MV 40 A
-CALL print_fib
-PRINT 10
+MV 37 A
+CALL fib
+PRINTN B
 
 EXIT
 

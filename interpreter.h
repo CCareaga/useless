@@ -16,7 +16,7 @@ typedef struct {
     struct lnode_t *labels;
 } executable_t;
 
-executable_t *vm_load(char *fn);
+executable_t *vm_load(char **fn);
 void vm_unload(executable_t *e);
 
 #endif

@@ -11,10 +11,6 @@ int nop(cpu_t *cpu, int *ram, uint16_t type) {
     return 1;
 }
 
-int dref(cpu_t *cpu, int *ram, uint16_t type) {
-    return 1;
-}
-
 int mv(cpu_t *cpu, int *ram, uint16_t type) {
 
     int val1 = ram[++cpu->pc]; 
@@ -52,7 +48,6 @@ int mv(cpu_t *cpu, int *ram, uint16_t type) {
     return 1;
 }
 
-// MATH INSTRUCTIONS =============================
 int vadd(cpu_t *cpu, int *ram, uint16_t type) {
     int val1 = ram[++cpu->pc]; 
     int val2 = ram[++cpu->pc]; 
@@ -232,7 +227,6 @@ int vmod(cpu_t *cpu, int *ram, uint16_t type) {
 
     return 1;
 }
-// ===============================================
 
 int eq(cpu_t *cpu, int *ram, uint16_t type) {
     int val1 = ram[++cpu->pc]; 
@@ -534,7 +528,8 @@ int printn(cpu_t *cpu, int *ram, uint16_t type) {
         default:
             return 0;
     }
-
+    
+    fflush(stdout);
     return 1;
 }
 
@@ -557,6 +552,8 @@ int print(cpu_t *cpu, int *ram, uint16_t type) {
         default:
             return 0;
     }
+
+    fflush(stdout);
 
     return 1;
 }

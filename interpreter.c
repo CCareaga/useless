@@ -12,20 +12,9 @@ static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
 
 
-// LABEL RELATED FUNCTIONS ================================================
-// print out the labels in an executable.
-void increment_labels(executable_t *exec, int len, int inc) {
-    
-    lnode_t *cur = exec->labels;
-    while (cur) {
-        if (cur->address >= len) {
-            cur->address += inc;
-        }
-
-        cur = cur->next;
-    }
-
-}
+// ========================================================================
+//                        LABEL RELATED FUNCTIONS 
+// ========================================================================
 
 // traverses the label linked list to determine if a word in the asm
 // is a label. if it is, the corresponding address is returned, otherwise 0
@@ -33,10 +22,9 @@ int is_label(char *word, executable_t *exec) {
     lnode_t *current = exec->labels;
 
     while (current) {
-        if (strcmp(current->name, word) == 0) {
+        if (strcmp(current->name, word) == 0) 
             return current->address; 
-        }
-
+        
         current = current->next;
     }
 
@@ -47,28 +35,26 @@ int is_label(char *word, executable_t *exec) {
 void add_label(executable_t *exec, char *name, int addr) {
     lnode_t *lbl = malloc(sizeof(lnode_t));
 
-    char *lbl_name = strdup((++name));
+    char *lbl_name = strdup(++name);
     lbl->name = lbl_name;
     lbl->address = addr;
 
     lnode_t *current = exec->labels;
 
-    if (!current) {
+    if (!current) 
         exec->labels = lbl;
-        return; 
-    }
+
     else {
-        while (current->next) {
+        while (current->next) 
             current = current->next; 
-        }
         
         current->next = lbl;
     }
 }
+
 // ========================================================================
-
-
-// COMPILATION FUNCTIONS ==================================================
+//                         COMPILATION FUNCTIONS 
+// ========================================================================
 
 // goes through a single line and saves tokens delimited by whitespace
 // the tokens are stored in a static array of strings saved on the heap
@@ -89,6 +75,10 @@ int tokenize(executable_t *exec, char *line) {
                 
                 if (*start == '$') 
                     add_label(exec, start, tok_cnt + 1);   
+
+                else if (!strcmp(start, "ENTRY"))
+                    exec->entry = tok_cnt + 1;
+
                 else 
                     tokens[tok_cnt++] = strdup(start); 
 
@@ -102,8 +92,8 @@ int tokenize(executable_t *exec, char *line) {
     return 0;
 }
 
-// goes through the array of tokens, converts them to op code and places
-// them in the executable structure
+// this function goes through the instructions and translates them
+// to op codes depending on the operands (L = literal, R = reference, M = memory)
 void process_inst(executable_t *exec, op_t *op, int *index) {
     int i = 0;
 
@@ -137,13 +127,11 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
             opcode = atoi(operand);
         }
 
-        printf("STR: %s -> OP: %d     ADDR: %d \n", operand, opcode, exec->length + i + 1);
         exec->code[exec->length + i + 1] = opcode;
         free(operand);
     }
 
-    printf("STR: %s -> OP: %d     ADDR: %d \n", op->op_str, get_opcode(op->op_str), exec->length);
-    exec->code[exec->length++] = (i_code << 16) | get_opcode(op->op_str);
+    exec->code[exec->length++] = (i_code << 16) | (int) (op - operations);
     exec->length += i;
 }
 
@@ -156,23 +144,17 @@ int assemble(executable_t *exec) {
     
         op_t *op = is_instruction(tok);
 
-        if (op) {
+        if (op) 
             process_inst(exec, op, &index);
-        }
-        else {
+        
+        else 
             exec->code[exec->length++] = atoi(tok);
-        }
 
         free(tok);
     }
 }
 
-executable_t *vm_load(char *fn) {
-    FILE *fp;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    int lno = 1;
+executable_t *vm_load(char **fnames) {
 
     executable_t *exec = malloc(sizeof(executable_t));
 
@@ -188,16 +170,25 @@ executable_t *vm_load(char *fn) {
 
     exec->length = BP + 1;
     exec->entry  = BP + 1;
+    
+    while(*fnames) {
+        FILE *fp;
+        char *line = NULL;
+        size_t len = 0;
+        ssize_t read;
+        int lno = 1;
 
-    fp = fopen(fn, "r");
-    if (!fp) return NULL;
+        fp = fopen(*fnames, "r");
+        if (!fp) return NULL;
 
-    while ((read = getline(&line, &len, fp)) != -1) {
-        if (line[strspn(line, " \t\v\r\n")] != '\0') 
-            tokenize(exec, line);
+        while ((read = getline(&line, &len, fp)) != -1) {
+            if (line[strspn(line, " \t\v\r\n")] != '\0') 
+                tokenize(exec, line);
+        }
+
+        fclose(fp);
+        fnames++;
     }
-
-    fclose(fp);
 
     assemble(exec);
 

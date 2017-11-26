@@ -33,6 +33,5 @@ enum regs {
 
 
 op_t *is_instruction(char *word);
-int is_register(char *word); int get_opcode(const char *word);
 
 #endif // _OPS_H
