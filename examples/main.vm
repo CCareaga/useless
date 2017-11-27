@@ -1,0 +1,16 @@
+ENTRY
+
+MV &word A 
+CALL print_word
+
+MV 20 A
+CALL print_fib
+
+PRINT 10
+
+EXIT
+
+$word
+    10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 
+
+

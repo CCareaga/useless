@@ -73,3 +73,40 @@ void vm_execute(executable_t *e) {
     free(cpu);
 }
 
+executable_t *read_bin(char *fn) {
+    
+    FILE *fp = fopen(fn, "rb");
+    if (!fp) return NULL;
+
+    int magic = 0;
+
+    executable_t *exec = malloc(sizeof(executable_t));
+    exec->code = malloc(sizeof(int) * RAM_SZ);
+    
+    fread(&magic, sizeof(int), 1, fp);
+
+    if (magic != 0xd00ddead) {
+        fclose(fp);
+        return NULL;
+    }
+
+    fread(&exec->length, sizeof(int), 1, fp);
+    fread(&exec->entry, sizeof(int), 1, fp);
+    fread(exec->code, sizeof(int), exec->length, fp);
+
+    fclose(fp);
+
+    return exec;
+}
+
+int main(int argc, char **argv) {
+    // executable_t *exec = vm_load(&argv[2]);
+    if (argc < 2) return 1;
+
+    executable_t *exec = read_bin(argv[1]);
+    if (!exec) return -1;
+
+    vm_execute(exec);
+    vm_unload(exec);
+}   
+

@@ -11,7 +11,6 @@ static int tok_start = BP;
 static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
 
-
 // ========================================================================
 //                        LABEL RELATED FUNCTIONS 
 // ========================================================================
@@ -136,7 +135,7 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
 }
 
 // this function goes through the token array and processes instructions
-int assemble(executable_t *exec) {
+void assemble(executable_t *exec) {
     int index = tok_start;
 
     while (index < tok_cnt) {
@@ -176,7 +175,7 @@ executable_t *vm_load(char **fnames) {
         char *line = NULL;
         size_t len = 0;
         ssize_t read;
-        int lno = 1;
+        // int lno = 1;
 
         fp = fopen(*fnames, "r");
         if (!fp) return NULL;

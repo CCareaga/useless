@@ -11,9 +11,9 @@ typedef struct lnode_t {
 
 typedef struct {
     size_t length; // length of the executable
-    int *code;     // buffer of op codes
+    int *code;     // array of op codes
     int entry;     // entry point of the program
-    struct lnode_t *labels;
+    struct lnode_t *labels; // label table
 } executable_t;
 
 executable_t *vm_load(char **fn);

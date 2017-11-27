@@ -6,12 +6,8 @@
 typedef struct {
     int argc;           // arg count
     const char *op_str; // operation name
-	int (*func) (cpu_t *cpu, int *ram, uint16_t type);
+    int (*func) (cpu_t *cpu, int *ram, uint16_t type);
 } op_t;
-
-typedef struct {
-    const char *name;   // register name
-} rcode_t;
 
 extern op_t operations[];
 
@@ -30,7 +26,6 @@ enum regs {
     SP,
     BP
 };
-
 
 op_t *is_instruction(char *word);
 
