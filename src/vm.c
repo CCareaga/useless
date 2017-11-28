@@ -8,6 +8,7 @@
 static int *ram;
 static cpu_t *cpu;
 
+// print the stack and the stack pointers
 void dump_stack(cpu_t *c) {
     int i = ram[SP];
 
@@ -37,7 +38,7 @@ void dump_cpu() {
     printf("========================\n\n");
 }
 
-// executes a given executable
+// executes a given executable_t
 void vm_execute(executable_t *e) {
     ram = malloc(RAM_SZ); 
     cpu = malloc(sizeof(cpu_t)); 
@@ -73,6 +74,7 @@ void vm_execute(executable_t *e) {
     free(cpu);
 }
 
+// unused function used to read a binary file assembled by assembly.c
 executable_t *read_bin(char *fn) {
     
     FILE *fp = fopen(fn, "rb");

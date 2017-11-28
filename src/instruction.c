@@ -7,6 +7,24 @@
 
 #define ocode(o1, o2, o3, o4) ((o4 << 12) | (o3 << 8) | (o2 << 4) | o1)
 
+// this file contains the code for all operations, when each operation
+// is called the state of the cpu, the ram arr, and the operand type is
+// passed in. the 16 bit operand type is a bit field representing what
+// types of the operands the instruction is called with.
+//
+// TYPE BIT FIELD 
+//  _______________ _______________ _______________ _______________     
+// |               |               |               |               |
+// | 0 | R | M | L | 0 | R | M | L | 0 | R | M | L | 0 | R | M | L |
+// |_______________|_______________|_______________|_______________|
+//     operand 1       operand 2       operand 3       operand 4
+//
+// L = literal   - this means we want to use the operand literally -> val
+// M = memory    - this means we want to access ram at the operand -> ram[val]
+// R = reference - this means we want to double access ram (deref) -> ram[ram[ind]]
+//
+// to convert the constants L, M, R to this format the ocode macro is used
+
 int nop(cpu_t *cpu, int *ram, uint16_t type) {
     return 1;
 }

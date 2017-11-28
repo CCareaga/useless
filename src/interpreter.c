@@ -56,7 +56,8 @@ void add_label(executable_t *exec, char *name, int addr) {
 // ========================================================================
 
 // goes through a single line and saves tokens delimited by whitespace
-// the tokens are stored in a static array of strings saved on the heap
+// the tokens are stored in a static array of strings on the heap
+// NOTE: labels are mapped in this stage, and the ENTRY of the program in found
 int tokenize(executable_t *exec, char *line) {
     int in_word = 0;
     char *start;
@@ -134,7 +135,8 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
     exec->length += i;
 }
 
-// this function goes through the token array and processes instructions
+// this function goes through the token array and either processes instructions
+// or translates the token to a literal. the tokens are then free'd
 void assemble(executable_t *exec) {
     int index = tok_start;
 
@@ -153,6 +155,8 @@ void assemble(executable_t *exec) {
     }
 }
 
+// this function creates an executable struct, adds registers,
+// and translates the given files into "byte" code
 executable_t *vm_load(char **fnames) {
 
     executable_t *exec = malloc(sizeof(executable_t));
