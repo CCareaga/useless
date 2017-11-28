@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g -I src/include
     
-DEPEND = src/interpreter.o src/instruction.o src/ops.o
+DEPEND = src/interpreter.o src/instruction.o src/ops.o src/debug.o
 
 default: uvm
 
@@ -13,4 +13,4 @@ ussembler: src/assembler.o $(DEPEND)
 
 clean:
 	rm -f src/*.o
-	rm -f ussembler uvm
+	rm -f uvm

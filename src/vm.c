@@ -4,39 +4,12 @@
 
 #include "vm.h"
 #include "ops.h"
+#include "debug.h"
 
 static int *ram;
 static cpu_t *cpu;
 
-// print the stack and the stack pointers
-void dump_stack(cpu_t *c) {
-    int i = ram[SP];
-
-    printf("======== STACK ========\n");
-    while (i < RAM_SZ) {
-        printf("%d: %d\n", i, ram[i]);
-        i++;
-    }
-
-    printf("\nSP: %d \n", ram[SP]);
-    printf("BP: %d \n", ram[BP]);
-    printf("=======================\n\n");
-}
-
-// print the program counter and registers
-void dump_cpu() {
-
-    printf("========= CPU ==========\n");
-    printf("A: %d \n", ram[A]);
-    printf("B: %d \n", ram[B]);
-    printf("C: %d \n", ram[C]);
-    printf("D: %d \n", ram[D]);
-    printf("E: %d \n", ram[E]);
-
-    printf("PC: %d \n", cpu->pc);
-    printf("OP: %s \n", operations[(uint16_t) ram[cpu->pc]].op_str);
-    printf("========================\n\n");
-}
+static int debug = 0;
 
 // executes a given executable_t
 void vm_execute(executable_t *e) {
@@ -57,17 +30,14 @@ void vm_execute(executable_t *e) {
     int running = 1;
 
     while (running) {
-        // dump_cpu();
-        // dump_stack(cpu);
-
         opcode = ram[cpu->pc];
         operation = (uint16_t) opcode;
         operands = opcode >> 16;
+        
+        vm_debug(cpu, ram, opcode);
 
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;
-
-        // getchar();
     }
 
     free(ram);
