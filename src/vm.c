@@ -100,11 +100,13 @@ executable_t *read_bin(char *fn) {
 }
 
 int main(int argc, char **argv) {
-    // executable_t *exec = vm_load(&argv[2]);
     if (argc < 2) return 1;
+    executable_t *exec = vm_load(&argv[1]);
 
-    executable_t *exec = read_bin(argv[1]);
-    if (!exec) return -1;
+    // NOTE: assembler.c is currently unused but it is possible to save useless 
+    // programs as binary files and read them into an exec struct using these lines
+    // executable_t *exec = read_bin(argv[1]);
+    // if (!exec) return -1;
 
     vm_execute(exec);
     vm_unload(exec);
