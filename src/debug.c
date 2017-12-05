@@ -47,20 +47,12 @@ static void dump_cpu(cpu_t *cpu, int *ram) {
 static void add_bp(int addr) {
     bp_t *new_bp = malloc(sizeof(bp_t));
     new_bp->address = addr;
-
-    if (!head) 
-        head = new_bp;
-        return;
-
-    bp_t *temp = head;
-
-    while (temp->next) 
-        temp = temp->next;
-
-    temp->next = new_bp;
-
+ 
+    new_bp->next = head;
+    head = new_bp;
 }
 
+// retrieve the bp node for a certain address if one exists
 static bp_t *get_bp(int addr) {
     bp_t *temp = head;
 
@@ -73,6 +65,7 @@ static bp_t *get_bp(int addr) {
 void vm_debug(cpu_t *cpu, int *ram, int op_code) {
     dump_cpu(cpu, ram);
     // dump_stack(cpu, ram);
+
     char c;
     int stopped = 1;
     
@@ -95,7 +88,7 @@ void vm_debug(cpu_t *cpu, int *ram, int op_code) {
                 break;
     
             case 'c':   
-                printf("continuing");
+                printf("continuing\n");
                 cont = 1;
                 stopped = 0;
                 break;
