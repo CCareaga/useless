@@ -50,7 +50,7 @@ void add_label(executable_t *exec, char *name, int addr) {
 
 // goes through a single line and saves tokens delimited by whitespace
 // the tokens are stored in a static array of strings on the heap
-// NOTE: labels are mapped in this stage, and the ENTRY of the program in found
+// NOTE: labels are mapped in this stage, and the entry of the program in found
 int tokenize(executable_t *exec, char *line) {
     int in_word = 0;
     char *start;
@@ -163,6 +163,7 @@ executable_t *vm_load(char **fnames) {
     add_label(exec, "$e",  E);
     add_label(exec, "$sp", SP);
     add_label(exec, "$bp", BP);
+    add_label(exec, "$r", RET);
 
     exec->length = BP + 1;
     exec->entry  = BP + 1;

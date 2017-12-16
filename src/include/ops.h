@@ -24,7 +24,8 @@ enum regs {
     D,
     E,
     SP,
-    BP
+    BP,
+    RET
 };
 
 op_t *is_instruction(char *word);
