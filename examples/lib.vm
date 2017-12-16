@@ -1,15 +1,17 @@
+~ this is a library file, it has one function but no entry point
+~ it can be run with another file that uses the function below
 
 $print_word
-    PUSH A
+    push a
 
     $loop
-        EQ 0 *A
-        HOPT str_ret
+        eq 0 *a
+        hopt str_ret
         
-        ADD 1 A
-        PRINT *A
-        HOP loop
+        add 1 a
+        print *a
+        hop loop
 
     $str_ret
-        POP A
-        RET
+        pop a
+        ret

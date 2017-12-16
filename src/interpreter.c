@@ -38,17 +38,10 @@ void add_label(executable_t *exec, char *name, int addr) {
     lbl->name = lbl_name;
     lbl->address = addr;
 
-    lnode_t *current = exec->labels;
-
-    if (!current) 
-        exec->labels = lbl;
-
-    else {
-        while (current->next) 
-            current = current->next; 
-        
-        current->next = lbl;
-    }
+    lnode_t *head = exec->labels;
+    
+    exec->labels = lbl;
+    lbl->next = head;
 }
 
 // ========================================================================
@@ -76,7 +69,7 @@ int tokenize(executable_t *exec, char *line) {
                 if (*start == '$') 
                     add_label(exec, start, tok_cnt + 1);   
 
-                else if (!strcmp(start, "ENTRY"))
+                else if (!strcmp(start, "entry"))
                     exec->entry = tok_cnt + 1;
 
                 else 
@@ -163,13 +156,13 @@ executable_t *vm_load(char **fnames) {
 
     exec->code = malloc(RAM_SZ);
 
-    add_label(exec, "$A",  A);
-    add_label(exec, "$B",  B);
-    add_label(exec, "$C",  C);
-    add_label(exec, "$D",  D);
-    add_label(exec, "$E",  E);
-    add_label(exec, "$SP", SP);
-    add_label(exec, "$BP", BP);
+    add_label(exec, "$a",  A);
+    add_label(exec, "$b",  B);
+    add_label(exec, "$c",  C);
+    add_label(exec, "$d",  D);
+    add_label(exec, "$e",  E);
+    add_label(exec, "$sp", SP);
+    add_label(exec, "$bp", BP);
 
     exec->length = BP + 1;
     exec->entry  = BP + 1;

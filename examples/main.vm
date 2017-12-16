@@ -1,14 +1,17 @@
-ENTRY
+~ this program uses the print word function and the print fib function
+~ there fore it must be run with the files "lib.vm" and "fib.vm"
 
-MV &word A 
-CALL print_word
+entry
 
-MV 20 A
-CALL print_fib
+mv &word a 
+call print_word
 
-PRINT 10
+mv 20 a
+call print_fib
 
-EXIT
+print 10
+
+exit
 
 $word
     10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 

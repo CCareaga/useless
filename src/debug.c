@@ -62,6 +62,7 @@ static bp_t *get_bp(int addr) {
     return temp;
 }
 
+// this function inplements debug functionality, run every instruction
 void vm_debug(cpu_t *cpu, int *ram, int op_code) {
     dump_cpu(cpu, ram);
     // dump_stack(cpu, ram);

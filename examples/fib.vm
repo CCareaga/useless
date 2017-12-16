@@ -1,60 +1,59 @@
-MV 20 A
-CALL print_fib
-PRINTN B
-PRINT 10
+mv 20 a
+call print_fib
+print 10
 
-EXIT
+exit
 
 ~ print N fib numbers, N stored in A
 $print_fib
-    PUSH C
+    push c
 
-    MV 1 C
+    mv 1 c
 
     $print_loop
-        PUSH A
+        push a
 
-        MV C A
-        CALL fib
-        PRINTN B
-        PRINT 32
+        mv c a
+        call fib
+        printn b
+        print 32
 
-        POP A
-        ADD 1 C
+        pop a
+        add 1 c
 
-        LTE A C
-        HOPT print_loop
+        lte a c
+        hopt print_loop
 
-    POP C
-    RET
+    pop c
+    ret
 
 ~ take N from A and place fib(N) in B
 $fib
-    PUSH A              ~ save N
+    push a              ~ save N
 
-    LTE 1 A             ~ if N is greater than 1 we jump to recursion
-    HOPF call_rec
+    lte 1 a             ~ if N is greater than 1 we jump to recursion
+    hopf call_rec
 
-    MV A B              ~ N is 1 or 0 so we place it in B (return reg)
-    POP A               ~ grab A off the stack and return
-    RET
+    mv a b              ~ N is 1 or 0 so we place it in B (return reg)
+    pop a               ~ grab A off the stack and return
+    ret
 
 $call_rec
-    CALL recurse        ~ start the recursion
-    RET
+    call recurse        ~ start the recursion
+    ret
 
 $recurse
-    PUSH A              ~ save A
-    SUB 1 A             ~ sub 1 from A and call fib 
-    CALL fib
-    PUSH B              ~ push the result
+    push a              ~ save A
+    sub 1 a             ~ sub 1 from A and call fib 
+    call fib
+    push b              ~ push the result
 
-    SUB 1 A             ~ sub 1 again and call fib
-    CALL fib
+    sub 1 a             ~ sub 1 again and call fib
+    call fib
 
-    POP A               ~ grab first result fib(n - 1) from stack
-    ADD A B             ~ add it to the second result
+    pop a               ~ grab first result fib(n - 1) from stack
+    add a b             ~ add it to the second result
 
-    POP A               ~ now pop N back into A and return
-    RET
+    pop a               ~ now pop N back into A and return
+    ret
 

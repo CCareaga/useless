@@ -1,33 +1,33 @@
-MV 4 A
-MV 8 B
-MV 123 C
+mv 4 a
+mv 8 b
+mv 123 c
 
-CALL mul_numbers
+call mul_numbers
 
-EXIT
+exit
 
-~ muliply the numbers in A and B, result in D
+~ multiply numbers in a and b store in b?
 $mul_numbers
-    PUSH C
-    MV 0 C
+    push c
+    mv 0 c
 
     $loop
-        ADD 1 C
-        CALL add_numbers
-        EQ C A
-        HOPF loop
+        add 1 c
+        call add_numbers
+        eq c a
+        hopf loop
        
-    POP C
-    RET
+    pop c
+    ret
 
-~ add the numbers in A and B result in D
+~ add the numbers in a and b result in d
 $add_numbers 
-    PUSH A
-    PUSH B
+    push a
+    push b
     
-    ADD B D
+    add b d
 
-    POP B
-    POP A
+    pop b
+    pop a
 
-    RET
+    ret

@@ -5,52 +5,51 @@
 #include "vm.h"
 
 op_t operations[] = {
-    {0, "NOP", nop},
+    {0, "nop", nop},
     
     // MATH =============
-    {2, "ADD", vadd},
-    {2, "SUB", vsub},
-    {2, "MUL", vmul},
-    {2, "DIV", vdiv},
-    {2, "MOD", vmod},
+    {2, "add", vadd},
+    {2, "sub", vsub},
+    {2, "mul", vmul},
+    {2, "div", vdiv},
+    {2, "mod", vmod},
     // ==================
 
     // COMPARISON =======
-    {2, "EQ", eq},
-    {2, "NEQ", neq},
-    {2, "LT", lt},
-    {2, "LTE", lte},
-    {2, "GT", gt},
-    {2, "GTE", gte},
+    {2, "eq", eq},
+    {2, "neq", neq},
+    {2, "lt", lt},
+    {2, "lte", lte},
+    {2, "gt", gt},
+    {2, "gte", gte},
     // ==================
 
     // MOVE =============
-    {2, "MV", mv},
+    {2, "mv", mv},
     // ==================
 
     // BRANCH ===========
-    {1, "HOP", hop},
-    {1, "HOPT", hopt},
-    {1, "HOPF", hopf},
+    {1, "hop", hop},
+    {1, "hopt", hopt},
+    {1, "hopf", hopf},
     // ==================
 
     // PRINT ============
-    {1, "PRINT", print},
-    {1, "PRINTN", printn},
+    {1, "print", print},
+    {1, "printn", printn},
     // ==================
 
     // STACK ============
-    {1, "PUSH", push},
-    {1, "POP", pop},
+    {1, "push", push},
+    {1, "pop", pop},
     // ==================
 
     // ROUTINES =========
-    
-    {1, "CALL", call},
-    {0, "RET", ret},
+    {1, "call", call},
+    {0, "ret", ret},
     // ==================
 
-    {0, "EXIT", vexit},
+    {0, "exit", vexit},
 
     {0, NULL, NULL}
 };
