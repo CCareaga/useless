@@ -12,6 +12,36 @@ static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
 
 // ========================================================================
+//                     LINE NUMBER FUNCTIONS 
+// ========================================================================
+
+// this function adds a new line num struct to the executable
+void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
+    lnum_t *ln = malloc(sizeof(lnum_t));
+
+    char *fn = strdup(fname);
+    ln->fname = fn;
+    ln->num = lno;
+    ln->start = start;
+    ln->stop = end;
+
+    lnum_t *head = exec->lnums;
+    
+    exec->lnums = ln;
+    ln->next = head;
+}
+
+// traverses the lnum linked list to determine the addr range of a line
+lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
+    lnum_t *current = exec->lnums;
+
+    while (current && !(strcmp(current->fname, fn) == 0 && current->num == lno))
+        current = current->next;
+    
+    return current;
+}
+
+// ========================================================================
 //                        LABEL RELATED FUNCTIONS 
 // ========================================================================
 
@@ -20,14 +50,10 @@ static int tok_cnt = BP;
 int is_label(char *word, executable_t *exec) {
     lnode_t *current = exec->labels;
 
-    while (current) {
-        if (strcmp(current->name, word) == 0) 
-            return current->address; 
-        
+    while (current && strcmp(current->name, word) != 0)
         current = current->next;
-    }
 
-    return 0;
+    return (current) ? current->address : 0;
 }
 
 // this function adds a new lbl to the executable mapped to the provided address
@@ -53,12 +79,12 @@ void add_label(executable_t *exec, char *name, int addr) {
 // NOTE: labels are mapped in this stage, and the entry of the program in found
 int tokenize(executable_t *exec, char *line) {
     int in_word = 0;
-    char *start;
+    char *token;
 
     while (*line != '\0' && *line != '~') {
         if (!in_word) {
             if (!(isspace(*line))) {
-                start = line;
+                token = line;
                 in_word = 1;
             }
         }
@@ -66,14 +92,14 @@ int tokenize(executable_t *exec, char *line) {
             if (isspace(*line)) {
                 *line = '\0';
                 
-                if (*start == '$') 
-                    add_label(exec, start, tok_cnt + 1);   
+                if (*token == '$') 
+                    add_label(exec, token, tok_cnt + 1);   
 
-                else if (!strcmp(start, "entry"))
+                else if (!strcmp(token, "entry"))
                     exec->entry = tok_cnt + 1;
 
                 else 
-                    tokens[tok_cnt++] = strdup(start); 
+                    tokens[tok_cnt++] = strdup(token); 
 
                 in_word = 0;
             }
@@ -142,7 +168,7 @@ void assemble(executable_t *exec) {
             process_inst(exec, op, &index);
         
         else 
-            exec->code[exec->length++] = atoi(tok);
+            exec->code[exec->length++] = (tok[0] == '&') ? is_label(tok + 1, exec) : atoi(tok);
 
         free(tok);
     }
@@ -173,14 +199,20 @@ executable_t *vm_load(char **fnames) {
         char *line = NULL;
         size_t len = 0;
         ssize_t read;
-        // int lno = 1;
+
+        int lno = 1;
+        int start;
 
         fp = fopen(*fnames, "r");
         if (!fp) return NULL;
 
         while ((read = getline(&line, &len, fp)) != -1) {
+            start = tok_cnt;
+
             if (line[strspn(line, " \t\v\r\n")] != '\0') 
                 tokenize(exec, line);
+
+            add_line(exec, *fnames, lno, start, tok_cnt);
         }
 
         fclose(fp);

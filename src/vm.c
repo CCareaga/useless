@@ -34,7 +34,7 @@ void vm_execute(executable_t *e) {
         operation = (uint16_t) opcode;
         operands = opcode >> 16;
         
-        // vm_debug(cpu, ram, opcode);
+        vm_debug(cpu, ram, opcode);
 
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;

@@ -4,6 +4,8 @@
 #include "ops.h"
 #include "vm.h"
 
+// array of operations, each operation consists of an arg count
+// the name of the operation and a pointer to the operation function
 op_t operations[] = {
     {0, "nop", nop},
     
@@ -54,6 +56,7 @@ op_t operations[] = {
     {0, NULL, NULL}
 };
 
+// returns an operation struct if the provided string is an operation
 op_t *is_instruction(char *word) {
     int i = 0;
 
