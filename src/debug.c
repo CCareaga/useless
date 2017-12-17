@@ -1,9 +1,14 @@
 #include "debug.h"
 #include "ops.h"
+#include "interpreter.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <libgen.h>
+
+#define MAX_TOK 3
 
 static int cont = 0;
 
@@ -13,6 +18,20 @@ typedef struct b_point {
 } bp_t;
 
 bp_t *head = NULL;
+
+// traverses the lnum linked list to determine the addr range of a line
+lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
+    lnum_t *current = exec->lnums;
+
+    while (current && !(strcmp(basename(current->fname), fn) == 0 && current->num == lno))
+        current = current->next;
+    
+    return current;
+}
+
+static void print_prompt() {
+    printf("udb >> ");
+}
 
 // print the stack and the stack pointers
 static void dump_stack(cpu_t *cpu, int *ram) {
@@ -41,6 +60,7 @@ static void dump_cpu(cpu_t *cpu, int *ram) {
     printf("PC: %d \n", cpu->pc);
     printf("OP: %s \n", operations[(uint16_t) ram[cpu->pc]].op_str);
     printf("========================\n\n");
+    print_prompt();
 }
 
 // add a new break point to the linked list
@@ -62,12 +82,31 @@ static bp_t *get_bp(int addr) {
     return temp;
 }
 
-static void new_bp(char **toks, cpu_t *cpu) {
+// add a new break point to the break point list. uses the tokens
+// to determine whether to set on a line num, label or current pos
+static void new_bp(executable_t *exec, char **toks, cpu_t *cpu) {
     static int bp_num = 1;
     int addr = 0;
-    addr = (toks[1]) ? atoi(toks[1]) : cpu->pc;
-    printf("%d: bp at: %d \n", bp_num++, addr);
-    add_bp(addr);
+
+    if (toks[2]) {
+        lnum_t *ln = get_lnum(exec, toks[1], atoi(toks[2]));
+        addr = (ln) ? ln->start : 0;
+    }
+    else if (toks[1]) {
+        addr = is_label(exec, toks[1]);
+        if (addr == 0) 
+            addr = atoi(toks[1]);
+    }
+    else {
+        addr = cpu->pc;
+    }
+        
+    if (addr) {
+        printf("%d: bp at: %d \n", bp_num++, addr);
+        add_bp(addr);
+    }
+    else 
+        printf("cannot set breakpoint \n");
 }
 
 static char **tokenize(char *line) {
@@ -75,9 +114,9 @@ static char **tokenize(char *line) {
     int index = 0;
     char *start;
     
-    char **tokens = malloc(sizeof(char *) * 2);
+    char **tokens = malloc(sizeof(char *) * MAX_TOK);
 
-    while (*line != '\0' && index < 2) {
+    while (*line != '\0' && index < MAX_TOK) {
         if (!in_word) {
             if (!(isspace(*line))) {
                 start = line;
@@ -100,9 +139,7 @@ static char **tokenize(char *line) {
 
 // this function inplements debug functionality, it runs after every instruction
 // this is probably a bad way to do it, also it is a mess but that's okay 
-void vm_debug(cpu_t *cpu, int *ram, int op_code) {
-    // dump_stack(cpu, ram);
-
+void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
     char c = 0;
     char *line = NULL;
     char **toks;
@@ -116,6 +153,7 @@ void vm_debug(cpu_t *cpu, int *ram, int op_code) {
         if (get_bp(cpu->pc)) {
             cont = 0;
             stopped = 1;
+            system("clear"); 
             dump_cpu(cpu, ram);
             getline(&line, &size, stdin);
         }
@@ -132,6 +170,8 @@ void vm_debug(cpu_t *cpu, int *ram, int op_code) {
     }
 
     while (stopped) {
+        if (strlen(toks[0]) > 1) c = 0;
+
         switch (c) {
             case 'n':
                 stopped = 0;
@@ -144,12 +184,15 @@ void vm_debug(cpu_t *cpu, int *ram, int op_code) {
                 break;
             
             case 'b':
-                new_bp(toks, cpu);
+                new_bp(exec, toks, cpu);
+                print_prompt();
                 stopped = 1;
                 break;
 
             default:
-                stopped = 0;
+                printf("unrecognized command! \n");
+                print_prompt();
+                stopped = 1;
                 break;
         }
         
@@ -161,7 +204,7 @@ void vm_debug(cpu_t *cpu, int *ram, int op_code) {
             c = toks[0][0];
         }
 
-        system("clear");
+        // system("clear");
     }
 }
 

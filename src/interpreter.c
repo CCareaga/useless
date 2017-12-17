@@ -16,29 +16,18 @@ static int tok_cnt = BP;
 // ========================================================================
 
 // this function adds a new line num struct to the executable
-void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
+void add_line(executable_t *exec, char *fname, int lno, int start) {
     lnum_t *ln = malloc(sizeof(lnum_t));
 
     char *fn = strdup(fname);
     ln->fname = fn;
     ln->num = lno;
     ln->start = start;
-    ln->stop = end;
 
     lnum_t *head = exec->lnums;
     
     exec->lnums = ln;
     ln->next = head;
-}
-
-// traverses the lnum linked list to determine the addr range of a line
-lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
-    lnum_t *current = exec->lnums;
-
-    while (current && !(strcmp(current->fname, fn) == 0 && current->num == lno))
-        current = current->next;
-    
-    return current;
 }
 
 // ========================================================================
@@ -47,7 +36,7 @@ lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
 
 // traverses the label linked list to determine if a word in the asm
 // is a label. if it is, the corresponding address is returned, otherwise 0
-int is_label(char *word, executable_t *exec) {
+int is_label(executable_t *exec, char *word) {
     lnode_t *current = exec->labels;
 
     while (current && strcmp(current->name, word) != 0)
@@ -124,16 +113,16 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
     for (i = 0; i < op->argc; i++) {
         operand = tokens[(*index)++];
 
-        int lbl = is_label(operand, exec);
+        int lbl = is_label(exec, operand);
         
         if (operand[0] == '*') {
             i_code |= R << (i * 4);
-            opcode = is_label(operand + 1, exec);
+            opcode = is_label(exec, operand + 1);
         }
 
         else if (operand[0] == '&') {
             i_code |= L << (i * 4);
-            opcode = is_label(operand + 1, exec);
+            opcode = is_label(exec, operand + 1);
         }
 
         else if (lbl) {
@@ -168,7 +157,7 @@ void assemble(executable_t *exec) {
             process_inst(exec, op, &index);
         
         else 
-            exec->code[exec->length++] = (tok[0] == '&') ? is_label(tok + 1, exec) : atoi(tok);
+            exec->code[exec->length++] = (tok[0] == '&') ? is_label(exec, tok + 1) : atoi(tok);
 
         free(tok);
     }
@@ -200,19 +189,19 @@ executable_t *vm_load(char **fnames) {
         size_t len = 0;
         ssize_t read;
 
-        int lno = 1;
+        int lno = 0;
         int start;
 
         fp = fopen(*fnames, "r");
         if (!fp) return NULL;
 
         while ((read = getline(&line, &len, fp)) != -1) {
-            start = tok_cnt;
+            start = tok_cnt - 1;
 
             if (line[strspn(line, " \t\v\r\n")] != '\0') 
                 tokenize(exec, line);
 
-            add_line(exec, *fnames, lno, start, tok_cnt);
+            add_line(exec, *fnames, lno++, start);
         }
 
         fclose(fp);
