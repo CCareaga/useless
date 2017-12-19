@@ -1,40 +1,41 @@
-MV &src A
+mv &src a
 
-CALL print_string
-CALL print_reverse
+call print_string
+call print_reverse
+print 10
 
-EXIT
+exit
 
-~ print string stored in A
+~ print the string stored in a
 $print_string
-    PUSH A
+    push a
 
     $loop
-        EQ 0 *A
-        HOPT str_ret
+        eq 0 *a
+        hopt str_ret
         
-        ADD 1 A
-        PRINT *A
-        HOP loop
+        print *a
+        add 1 a
+        hop loop
 
     $str_ret
-        POP A
-        RET
+        pop a
+        ret
 
 $print_reverse
-    PUSH A
+    push a
 
-    EQ 0 *A
-    HOPT rev_ret
+    eq 0 *a
+    hopt rev_ret
     
-    ADD 1 A
-    CALL print_reverse
-    PRINT *A 
+    add 1 a
+    call print_reverse
+    print *a 
 
     $rev_ret
-        POP A
-        SUB 1 A
-        RET
+        pop a
+        sub 1 a
+        ret
 
 $src
-    10 73 32 97 109 32 117 115 101 108 101 115 115 10 0 
+    "I am useless \n"

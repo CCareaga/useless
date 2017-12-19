@@ -95,6 +95,8 @@ void add_label(executable_t *exec, char *name, int addr) {
 //      letter                    anything
 // ----------------------------------------------------
 
+// this function runs the state machine, the tokens in the src file
+// are saved in a static array on the heap, this gets called on every line
 int tokenize(executable_t *exec, char *line) {
     state_t state = state0;
     char *start;
@@ -107,6 +109,9 @@ int tokenize(executable_t *exec, char *line) {
     return (state == state2);
 }
 
+// this function gets called on each token in the src file.
+// it adds labels and adds the entry point of the program otherwise
+// it just strdups the token to save it
 static void add_token(executable_t *exec, char *token) {
     if (*token == '$') 
         add_label(exec, token, tok_cnt + 1);   
@@ -118,16 +123,14 @@ static void add_token(executable_t *exec, char *token) {
         tokens[tok_cnt++] = strdup(token); 
 }
 
-static void add_string(executable_t *exec, char *token) {   
-    printf("qouted word: %s \n", token);
-}
-
+// state0 start state, we loop on spaces and move states when
+// we see a letter or a quote, if we see non-space we save the start
 static void *state0(executable_t *exec, char *c, char **start) {
     if (isspace(*c)) 
         return state0;
 
     else if (*c == '"') {
-        *start = c + 1; 
+        *start = c; 
         return state2;
     }
 
@@ -137,6 +140,8 @@ static void *state0(executable_t *exec, char *c, char **start) {
     }
 }
 
+// state1 means we have seen the start of a word and now we are
+// consuming characters until we see a space or a quote
 static void *state1(executable_t *exec, char *c, char **start) {
     if (isspace(*c)) {
         *c = '\0';
@@ -145,7 +150,7 @@ static void *state1(executable_t *exec, char *c, char **start) {
     }
 
     else if (*c == '"') {
-        *start = c + 1;
+        *start = c;
         return state2;
     }
 
@@ -153,51 +158,17 @@ static void *state1(executable_t *exec, char *c, char **start) {
         return state1;
 }
 
+// state2 means we have seen one quote, we loop on all characters 
+// until we see the ending quote, if we end in this state it means
+// we have seen mismatched qoutes.
 static void *state2(executable_t *exec, char *c, char **start) {
     if (*c == '"') {
         *c = '\0';
-        add_string(exec, *start); 
+        add_token(exec, *start); 
         return state1;
     }
     else 
         return state2;
-}
-
-// goes through a single line and saves tokens delimited by whitespace
-// the tokens are stored in a static array of strings on the heap
-// NOTE: labels are mapped in this stage, and the entry of the program in found
-int old_tokenize(executable_t *exec, char *line) {
-    int in_word = 0;
-    char *token;
-
-    while (*line != '\0' && *line != '~') {
-        if (!in_word) {
-            if (!(isspace(*line))) {
-                token = line;
-                in_word = 1;
-            }
-        }
-        else {
-            if (isspace(*line)) {
-                *line = '\0';
-                
-                if (*token == '$') 
-                    add_label(exec, token, tok_cnt + 1);   
-
-                else if (!strcmp(token, "entry"))
-                    exec->entry = tok_cnt + 1;
-
-                else 
-                    tokens[tok_cnt++] = strdup(token); 
-
-                in_word = 0;
-            }
-        }
-
-        line++;
-    }
-    
-    return 0;
 }
 
 // this function goes through the instructions and translates them
@@ -243,6 +214,45 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
     exec->length += i;
 }
 
+// this converts an escape character into the actual ascii for
+// the escape sequence eg. n => 10 t => 11
+int convert_escape(char c) {
+    switch (c) {
+        case 'n':
+            return 10;
+
+        case 't':
+            return 11;
+
+        default:
+            return (int) c;
+    }
+}
+
+// this function adds a string into the programs memory. we skip
+// the first letter because its a qoute, we also add the null terminator to memory
+// we also account for escape sequences ( works alright I guess)
+void process_string(executable_t *exec, char *str) {
+    int escape = 0;
+
+    str++;
+    while (*str) {
+        if (escape) {
+            exec->code[exec->length++] = convert_escape(*str);
+            escape = 0;
+        }
+
+        else if (*str == '\\') 
+            escape = 1;
+        else 
+            exec->code[exec->length++] = *str;
+
+        str++;
+    }
+
+    exec->code[exec->length++] = 0;
+}
+
 // this function goes through the token array and either processes instructions
 // or translates the token to a literal. the tokens are then free'd
 void assemble(executable_t *exec) {
@@ -255,7 +265,10 @@ void assemble(executable_t *exec) {
 
         if (op) 
             process_inst(exec, op, &index);
-        
+
+        else if (tok[0] == '"') 
+            process_string(exec, tok);
+
         else 
             exec->code[exec->length++] = (tok[0] == '&') ? is_label(exec, tok + 1) : atoi(tok);
 
