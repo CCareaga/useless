@@ -26,11 +26,12 @@ typedef struct {
     size_t length;          // length of the executable
     int *code;              // array of op codes
     int entry;              // entry point of the program
+    int debug;              // debugging mode flag
     struct lnode_t *labels; // label table
     struct lnum_t *lnums;   // line num table
 } executable_t;
 
-executable_t *vm_load(char **fn);
+executable_t *vm_load(char **fn, int debug);
 void vm_unload(executable_t *e);
 int is_label(executable_t *exec, char *word);
 

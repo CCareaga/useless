@@ -9,8 +9,6 @@
 static int *ram;
 static cpu_t *cpu;
 
-static int debug = 0;
-
 // executes a given executable_t
 void vm_execute(executable_t *e) {
     ram = malloc(RAM_SZ); 
@@ -34,7 +32,8 @@ void vm_execute(executable_t *e) {
         operation = (uint16_t) opcode;
         operands = opcode >> 16;
         
-        // vm_debug(e, cpu, ram, opcode);
+        if (e->debug)
+            vm_debug(e, cpu, ram, opcode);
 
         running = operations[operation].func(cpu, ram, operands);
         cpu->pc++;
@@ -70,17 +69,4 @@ executable_t *read_bin(char *fn) {
 
     return exec;
 }
-
-int main(int argc, char **argv) {
-    if (argc < 2) return 1;
-    executable_t *exec = vm_load(&argv[1]);
-
-    // NOTE: assembler.c is currently unused but it is possible to save useless 
-    // programs as binary files and read them into an exec struct using these lines
-    // executable_t *exec = read_bin(argv[1]);
-    // if (!exec) return -1;
-
-    vm_execute(exec);
-    vm_unload(exec);
-}   
 

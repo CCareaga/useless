@@ -30,6 +30,7 @@ void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
     ln->num = lno;
     ln->start = start;
     ln->stop = end;
+    ln->next = NULL;
     
     lnum_t *current = exec->lnums;
 
@@ -64,6 +65,7 @@ void add_label(executable_t *exec, char *name, int addr) {
     char *lbl_name = strdup(++name);
     lbl->name = lbl_name;
     lbl->address = addr;
+    lbl->next = NULL;
 
     lnode_t *head = exec->labels;
     
@@ -109,12 +111,58 @@ int tokenize(executable_t *exec, char *line) {
     return (state == state2);
 }
 
+// this converts an escape character into the actual ascii for
+// the escape sequence eg. n => 10 t => 11
+int convert_escape(char c) {
+    switch (c) {
+        case 'n':
+            return 10;
+
+        case 't':
+            return 11;
+
+        default:
+            return (int) c;
+    }
+}
+
+// this function adds a string into the programs memory. we skip
+// the first letter because its a qoute, we also add the null terminator to memory
+// we also account for escape sequences ( works alright I guess)
+static void add_string(executable_t *exec, char *str) {
+    int escape = 0;
+    char buf[5];
+   
+    str++;
+    while (*str != '"') {
+        if (escape) {
+            sprintf(buf, "%d", convert_escape(*str));
+            tokens[tok_cnt++] = strdup(buf); 
+            escape = 0;
+        }
+
+        else if (*str == '\\') 
+            escape = 1;
+
+        else {
+            sprintf(buf, "%d", (int) *str);
+            tokens[tok_cnt++] = strdup(buf); 
+        }
+
+        str++;
+    }
+
+    tokens[tok_cnt++] = strdup("0"); 
+}
 // this function gets called on each token in the src file.
 // it adds labels and adds the entry point of the program otherwise
 // it just strdups the token to save it
 static void add_token(executable_t *exec, char *token) {
     if (*token == '$') 
         add_label(exec, token, tok_cnt + 1);   
+
+    else if (*token == '"') 
+        add_string(exec, token);
 
     else if (!strcmp(token, "entry"))
         exec->entry = tok_cnt + 1;
@@ -150,7 +198,6 @@ static void *state1(executable_t *exec, char *c, char **start) {
     }
 
     else if (*c == '"') {
-        *start = c;
         return state2;
     }
 
@@ -163,8 +210,6 @@ static void *state1(executable_t *exec, char *c, char **start) {
 // we have seen mismatched qoutes.
 static void *state2(executable_t *exec, char *c, char **start) {
     if (*c == '"') {
-        *c = '\0';
-        add_token(exec, *start); 
         return state1;
     }
     else 
@@ -214,45 +259,6 @@ void process_inst(executable_t *exec, op_t *op, int *index) {
     exec->length += i;
 }
 
-// this converts an escape character into the actual ascii for
-// the escape sequence eg. n => 10 t => 11
-int convert_escape(char c) {
-    switch (c) {
-        case 'n':
-            return 10;
-
-        case 't':
-            return 11;
-
-        default:
-            return (int) c;
-    }
-}
-
-// this function adds a string into the programs memory. we skip
-// the first letter because its a qoute, we also add the null terminator to memory
-// we also account for escape sequences ( works alright I guess)
-void process_string(executable_t *exec, char *str) {
-    int escape = 0;
-
-    str++;
-    while (*str) {
-        if (escape) {
-            exec->code[exec->length++] = convert_escape(*str);
-            escape = 0;
-        }
-
-        else if (*str == '\\') 
-            escape = 1;
-        else 
-            exec->code[exec->length++] = *str;
-
-        str++;
-    }
-
-    exec->code[exec->length++] = 0;
-}
-
 // this function goes through the token array and either processes instructions
 // or translates the token to a literal. the tokens are then free'd
 void assemble(executable_t *exec) {
@@ -266,9 +272,6 @@ void assemble(executable_t *exec) {
         if (op) 
             process_inst(exec, op, &index);
 
-        else if (tok[0] == '"') 
-            process_string(exec, tok);
-
         else 
             exec->code[exec->length++] = (tok[0] == '&') ? is_label(exec, tok + 1) : atoi(tok);
 
@@ -278,7 +281,7 @@ void assemble(executable_t *exec) {
 
 // this function creates an executable struct, adds registers,
 // and translates the given files into "byte" code
-executable_t *vm_load(char **fnames) {
+executable_t *vm_load(char **fnames, int dbg) {
 
     executable_t *exec = malloc(sizeof(executable_t));
 
@@ -295,6 +298,7 @@ executable_t *vm_load(char **fnames) {
 
     exec->length = BP + 1;
     exec->entry  = BP + 1;
+    exec->debug  = dbg;
     
     while(*fnames) {
         FILE *fp;
@@ -314,7 +318,8 @@ executable_t *vm_load(char **fnames) {
             if (line[strspn(line, " \t\v\r\n")] != '\0') 
                 tokenize(exec, line);
 
-            add_line(exec, *fnames, lno++, start, tok_cnt + 1);
+            if (dbg)
+                add_line(exec, *fnames, lno++, start, tok_cnt + 1);
         }
 
         fclose(fp);

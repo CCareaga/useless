@@ -64,6 +64,30 @@ static void dump_cpu(cpu_t *cpu, int *ram) {
     print_prompt();
 }
 
+static void print_lbl(executable_t* exec, int *ram, char **toks) {
+    int lbl;
+    int val;
+    int deref = 0;
+
+    if (toks[1]) {
+        if (toks[1][0] == '*') {
+            deref = 1;
+            (toks[1])++;
+        }
+            
+        lbl = is_label(exec, toks[1]);
+
+        if (lbl) { 
+            val = (deref) ? ram[ram[lbl]] : ram[lbl];
+            printf("%s: %d \n", toks[1], val);
+        }
+        else
+            printf("no label with name: %s \n", toks[1]);
+    }
+    else
+        printf("print takes one argument\n");
+}
+
 // add a new break point to the linked list
 static void add_bp(int addr) {
     bp_t *new_bp = malloc(sizeof(bp_t));
@@ -166,13 +190,12 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
         getline(&line, &size, stdin);
     }
     
-    if (line) {
+    if (line[0] != 10) {
         toks = tokenize(line);
         c = toks[0][0];
     }
 
     while (stopped) {
-        if (strlen(toks[0]) > 1) c = 0;
 
         switch (c) {
             case 'n':
@@ -191,6 +214,12 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
                 stopped = 1;
                 break;
 
+            case 'p':
+                print_lbl(exec, ram, toks);
+                print_prompt();
+                stopped = 1;
+                break;
+
             case 's':
                 system("clear");
                 dump_stack(cpu, ram);
@@ -200,6 +229,7 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
 
             default:
                 if (line[0] == 10) {
+                    printf("next \n");
                     stopped = 0;
                 }
                 else { 
