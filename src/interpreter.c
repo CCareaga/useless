@@ -11,23 +11,35 @@ static int tok_start = BP;
 static char *tokens[RAM_SZ];
 static int tok_cnt = BP;
 
+typedef void *(*state_t) (executable_t *exec, char *c, char **start);
+
+static void *state0(executable_t *exec, char *c, char **start);
+static void *state1(executable_t *exec, char *c, char **start);
+static void *state2(executable_t *exec, char *c, char **start);
+
 // ========================================================================
 //                     LINE NUMBER FUNCTIONS 
 // ========================================================================
 
 // this function adds a new line num struct to the executable
-void add_line(executable_t *exec, char *fname, int lno, int start) {
+void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
     lnum_t *ln = malloc(sizeof(lnum_t));
 
     char *fn = strdup(fname);
     ln->fname = fn;
     ln->num = lno;
     ln->start = start;
-
-    lnum_t *head = exec->lnums;
+    ln->stop = end;
     
-    exec->lnums = ln;
-    ln->next = head;
+    lnum_t *current = exec->lnums;
+
+    while (current && current->next) 
+        current = current->next; 
+    
+    if (current) 
+        current->next = ln;
+    else
+        exec->lnums = ln;
 }
 
 // ========================================================================
@@ -63,10 +75,98 @@ void add_label(executable_t *exec, char *name, int addr) {
 //                         COMPILATION FUNCTIONS 
 // ========================================================================
 
+// STATE MACHINE ==========================================================
+//                    space
+//                    +----+
+//                    |    |
+//     letter       +-+----v-+       qoute
+//      +-----------+        +----------+
+//      |           | state0 |          |
+//      |    +------>        |          |
+//      |    |space +--------+          |
+//      |    |                          |
+//    +-v----+-+      qoute      +------v-+
+//    |        <-----------------+        |
+//    | state1 |                 | state2 |
+//    |        +----------------->        |
+//    +-+----^-+      qoute      +-^----+-+
+//      |    |                     |    |
+//      +----+                     +----+
+//      letter                    anything
+// ----------------------------------------------------
+
+int tokenize(executable_t *exec, char *line) {
+    state_t state = state0;
+    char *start;
+
+    while (*line && *line != '~') {
+        state = (state_t) (*state)(exec, line, &start);
+        line++;
+    }
+
+    return (state == state2);
+}
+
+static void add_token(executable_t *exec, char *token) {
+    if (*token == '$') 
+        add_label(exec, token, tok_cnt + 1);   
+
+    else if (!strcmp(token, "entry"))
+        exec->entry = tok_cnt + 1;
+
+    else 
+        tokens[tok_cnt++] = strdup(token); 
+}
+
+static void add_string(executable_t *exec, char *token) {   
+    printf("qouted word: %s \n", token);
+}
+
+static void *state0(executable_t *exec, char *c, char **start) {
+    if (isspace(*c)) 
+        return state0;
+
+    else if (*c == '"') {
+        *start = c + 1; 
+        return state2;
+    }
+
+    else {
+        *start = c;
+        return state1;
+    }
+}
+
+static void *state1(executable_t *exec, char *c, char **start) {
+    if (isspace(*c)) {
+        *c = '\0';
+        add_token(exec, *start);
+        return state0;
+    }
+
+    else if (*c == '"') {
+        *start = c + 1;
+        return state2;
+    }
+
+    else 
+        return state1;
+}
+
+static void *state2(executable_t *exec, char *c, char **start) {
+    if (*c == '"') {
+        *c = '\0';
+        add_string(exec, *start); 
+        return state1;
+    }
+    else 
+        return state2;
+}
+
 // goes through a single line and saves tokens delimited by whitespace
 // the tokens are stored in a static array of strings on the heap
 // NOTE: labels are mapped in this stage, and the entry of the program in found
-int tokenize(executable_t *exec, char *line) {
+int old_tokenize(executable_t *exec, char *line) {
     int in_word = 0;
     char *token;
 
@@ -189,19 +289,19 @@ executable_t *vm_load(char **fnames) {
         size_t len = 0;
         ssize_t read;
 
-        int lno = 0;
+        int lno = 1;
         int start;
 
         fp = fopen(*fnames, "r");
         if (!fp) return NULL;
 
         while ((read = getline(&line, &len, fp)) != -1) {
-            start = tok_cnt - 1;
+            start = tok_cnt + 1;
 
             if (line[strspn(line, " \t\v\r\n")] != '\0') 
                 tokenize(exec, line);
 
-            add_line(exec, *fnames, lno++, start);
+            add_line(exec, *fnames, lno++, start, tok_cnt + 1);
         }
 
         fclose(fp);

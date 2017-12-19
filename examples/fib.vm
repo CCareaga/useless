@@ -57,3 +57,5 @@ $recurse
     pop a               ~ now pop N back into A and return
     ret
 
+$test
+    "string test"

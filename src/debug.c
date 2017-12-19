@@ -25,10 +25,11 @@ lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
 
     while (current && !(strcmp(basename(current->fname), fn) == 0 && current->num == lno))
         current = current->next;
-    
+
     return current;
 }
 
+// prints the debugger prompt :-)
 static void print_prompt() {
     printf("udb >> ");
 }
@@ -115,6 +116,7 @@ static char **tokenize(char *line) {
     char *start;
     
     char **tokens = malloc(sizeof(char *) * MAX_TOK);
+    memset(tokens, 0, sizeof(char *) * MAX_TOK);
 
     while (*line != '\0' && index < MAX_TOK) {
         if (!in_word) {
@@ -189,10 +191,22 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
                 stopped = 1;
                 break;
 
-            default:
-                printf("unrecognized command! \n");
-                print_prompt();
+            case 's':
+                system("clear");
+                dump_stack(cpu, ram);
+                print_prompt(); 
                 stopped = 1;
+                break;
+
+            default:
+                if (line[0] == 10) {
+                    stopped = 0;
+                }
+                else { 
+                    printf("unrecognized command! \n");
+                    print_prompt();
+                    stopped = 1;
+                }
                 break;
         }
         
@@ -203,8 +217,6 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
             toks = tokenize(line); 
             c = toks[0][0];
         }
-
-        // system("clear");
     }
 }
 

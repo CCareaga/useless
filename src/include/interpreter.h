@@ -18,6 +18,7 @@ typedef struct lnum_t {
     char *fname;
     int num;
     int start;
+    int stop;
     struct lnum_t *next;
 } lnum_t;
 
