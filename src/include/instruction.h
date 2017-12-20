@@ -24,6 +24,7 @@ int printn(cpu_t *cpu, int *ram, uint16_t type);
 
 int push(cpu_t *cpu, int *ram, uint16_t type);
 int pop(cpu_t *cpu, int *ram, uint16_t type);
+int smv(cpu_t *cpu, int *ram, uint16_t type);
 
 int eq(cpu_t *cpu, int *ram, uint16_t type);
 int neq(cpu_t *cpu, int *ram, uint16_t type);

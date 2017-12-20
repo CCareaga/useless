@@ -1,7 +1,7 @@
 # useless
 ---
 
-In its current state useless is a simple register-based virtual machine written in C. It has 23 instructions and uses an assemlby language smiliar to x86 assembly. 
+In its current state useless is a simple register-based virtual machine written in C. It has 24 instructions and uses an assembly language similiar to x86 assembly. 
 
 
 #### Building and Running

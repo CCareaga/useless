@@ -44,6 +44,7 @@ op_t operations[] = {
     // STACK ============
     {1, "push", push},
     {1, "pop", pop},
+    {2, "smv", smv},
     // ==================
 
     // ROUTINES =========

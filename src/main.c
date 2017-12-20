@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+void usage() {
+    printf("u messed up the args, but there is no usage message yet \n");
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) return 1;
 
@@ -19,7 +23,7 @@ int main(int argc, char **argv) {
                 break;
 
             default:
-                abort();
+                usage();
         }
     }
     
@@ -31,8 +35,10 @@ int main(int argc, char **argv) {
     // programs as binary files and read them into an exec struct using these lines
     // executable_t *exec = read_bin(argv[1]);
     // if (!exec) return -1;
-
-    vm_execute(exec);
-    vm_unload(exec);
+    
+    if (exec) {
+        vm_execute(exec);
+        vm_unload(exec);
+    }
 }   
 

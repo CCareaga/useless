@@ -626,6 +626,46 @@ int pop(cpu_t *cpu, int *ram, uint16_t type) {
     return 1;
 }
 
+int smv(cpu_t *cpu, int *ram, uint16_t type) {
+    int off = ram[++cpu->pc]; 
+    int loc = ram[++cpu->pc]; 
+    int bp  = ram[BP] + 1;
+    
+    switch (type) {
+        case (ocode(L, M, 0, 0)):
+            break;
+
+        case (ocode(M, M, 0, 0)):
+            off = ram[off];
+            break;
+
+        case (ocode(R, M, 0, 0)):
+            off = ram[ram[off]];
+            break;
+        
+        case (ocode(L, R, 0, 0)):
+            loc = ram[loc];
+            break;
+
+        case (ocode(M, R, 0, 0)):
+            off = ram[off];
+            loc = ram[loc];
+            break;
+
+        case (ocode(R, R, 0, 0)):
+            off = ram[ram[off]];
+            loc = ram[loc];
+            break;
+
+        default:
+            return 0;
+    }
+    
+    ram[loc] = ram[bp + off];
+
+    return 1;
+}
+
 int call(cpu_t *cpu, int *ram, uint16_t type) {
     int val = ram[++cpu->pc]; 
 

@@ -1,0 +1,20 @@
+entry
+
+push 123
+push 789
+push 999
+
+call routine
+add 3 sp
+
+exit
+
+$routine
+    smv 1 a
+    smv 2 b
+    smv 3 c
+
+    ret
+
+
+

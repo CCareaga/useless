@@ -99,6 +99,7 @@ void add_label(executable_t *exec, char *name, int addr) {
 
 // this function runs the state machine, the tokens in the src file
 // are saved in a static array on the heap, this gets called on every line
+// returns 1 on error (non-accept state) and 0 otherwise
 int tokenize(executable_t *exec, char *line) {
     state_t state = state0;
     char *start;
@@ -128,7 +129,7 @@ int convert_escape(char c) {
 
 // this function adds a string into the programs memory. we skip
 // the first letter because its a qoute, we also add the null terminator to memory
-// we also account for escape sequences ( works alright I guess)
+// we also account for escape sequences (works alright I guess)
 static void add_string(executable_t *exec, char *str) {
     int escape = 0;
     char buf[5];
@@ -155,8 +156,8 @@ static void add_string(executable_t *exec, char *str) {
     tokens[tok_cnt++] = strdup("0"); 
 }
 // this function gets called on each token in the src file.
-// it adds labels and adds the entry point of the program otherwise
-// it just strdups the token to save it
+// it adds labels and adds the entry point of the program. for every
+// other token it saves the token on the heap and adds it to the token arr
 static void add_token(executable_t *exec, char *token) {
     if (*token == '$') 
         add_label(exec, token, tok_cnt + 1);   
@@ -282,6 +283,7 @@ void assemble(executable_t *exec) {
 // this function creates an executable struct, adds registers,
 // and translates the given files into "byte" code
 executable_t *vm_load(char **fnames, int dbg) {
+    int err = 0;
 
     executable_t *exec = malloc(sizeof(executable_t));
 
@@ -310,13 +312,17 @@ executable_t *vm_load(char **fnames, int dbg) {
         int start;
 
         fp = fopen(*fnames, "r");
-        if (!fp) return NULL;
+        if (!fp) 
+            return NULL;
 
-        while ((read = getline(&line, &len, fp)) != -1) {
+        while ((read = getline(&line, &len, fp)) != -1 && !err) {
             start = tok_cnt + 1;
 
-            if (line[strspn(line, " \t\v\r\n")] != '\0') 
-                tokenize(exec, line);
+            if (line[strspn(line, " \t\v\r\n")] != '\0') {
+                err = tokenize(exec, line);
+                if (err) 
+                    fprintf(stderr, "%s:%d - mistmatched quotes \n", *fnames, lno);
+            }
 
             if (dbg)
                 add_line(exec, *fnames, lno++, start, tok_cnt + 1);
@@ -325,10 +331,11 @@ executable_t *vm_load(char **fnames, int dbg) {
         fclose(fp);
         fnames++;
     }
+    
+    if (!err) 
+        assemble(exec);
 
-    assemble(exec);
-
-    return exec;
+    return (err) ? NULL : exec;    
 }
 
 // TODO: make sure to free the memory we used!

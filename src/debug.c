@@ -164,11 +164,11 @@ static char **tokenize(char *line) {
 }
 
 // this function inplements debug functionality, it runs after every instruction
-// this is probably a bad way to do it, also it is a mess but that's okay 
+// this is probably a bad way to do it, also it is a big mess but that's okay 
 void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
     char c = 0;
     char *line = NULL;
-    char **toks;
+    char **toks = NULL;
     size_t size;
 
     int stopped = 1;
@@ -190,10 +190,12 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
         getline(&line, &size, stdin);
     }
     
-    if (line[0] != 10) {
+    if (line && line[0] != 10) {
         toks = tokenize(line);
         c = toks[0][0];
     }
+    else 
+        c = 'n';
 
     while (stopped) {
 
@@ -228,24 +230,25 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
                 break;
 
             default:
-                if (line[0] == 10) {
-                    printf("next \n");
-                    stopped = 0;
-                }
-                else { 
-                    printf("unrecognized command! \n");
-                    print_prompt();
-                    stopped = 1;
-                }
+                printf("unrecognized command! \n");
+                print_prompt();
+                stopped = 1;
                 break;
         }
         
-        if (toks) free(toks);
+        if (toks) {
+            free(toks);
+            toks = NULL;
+        }
 
         if (stopped) {
             getline(&line, &size, stdin);
-            toks = tokenize(line); 
-            c = toks[0][0];
+            if (line && line[0] != 10) {
+                toks = tokenize(line); 
+                c = toks[0][0];
+            }
+            else 
+                c = 'n';
         }
     }
 }

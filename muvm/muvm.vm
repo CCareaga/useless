@@ -1,13 +1,25 @@
 entry
 
-$mainloop
-    eq 0 running
-    hopt end
+~ initialise the cpu and start the machine running
+$main
+    call init_cpu
     
-    hop mainloop
+    $mainloop
+        eq 0 running
+        hopt end
+    
+        hop mainloop
 
 $end
     exit
+
+~ set the stack pointer and base pointer to the end of ram
+$init_cpu
+    mv &ram vsp
+    add 99 vsp
+    mv vsp vbp
+
+    ret
 
 ~~~~~~~~~ variables ~~~~~~~~~
 $ram 
@@ -20,11 +32,16 @@ $ram
     0 0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 1
 
 $pc 0 
-$sp 99
-$bp 99
+$vsp 0
+$vbp 0
     
 $running 1
+
+$program
+    "push 4"
+    "push 5"
+    "add"
 
