@@ -3,7 +3,7 @@ entry
 ~ initialise the cpu and start the machine running
 $main
     call init_cpu
-    
+
     $mainloop
         eq 0 running
         hopt end

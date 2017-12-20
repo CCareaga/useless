@@ -1,0 +1,22 @@
+
+~ array elements consist of operation string, operation index
+~ and the number of arguments the operation takes
+
+$op_array
+    &nop_str 0 0
+    &push_str 1 1
+    &pop_str 2 0
+    &add_str 3 0
+    &sub_str 4 0
+    &mul_str 5 0
+    &div_str 6 0
+
+
+$nop_str    "nop"
+$push_str   "push"
+$pop_str    "pop"
+$add_str    "add"
+$sub_str    "sub"
+$mul_str    "mul"
+$div_str    "div"
+

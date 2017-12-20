@@ -1,0 +1,82 @@
+
+~ tests two strings for equality (in a and b), result in r
+$c1 0
+$c2 0
+$len 0
+
+$str_equals
+    push a              ~ save the strings
+    push b
+
+    call strlen         ~ call strlen on str 1, push result
+    mv r len
+
+    mv b a              ~ call strlen on str 2
+    call strlen
+
+    eq r len
+    hopf str_eq_false   ~ length unequal return false
+
+    pop b               ~ restore a and b and also save them
+    pop a
+
+    push a              ~ save the values again to restore before ret
+    push b
+
+    $str_eq_loop
+        mv *a c1            ~ store each character we are looking at
+        mv *b c2
+
+        neq c1 c2           ~ if they arent equal ret false
+        hopt str_eq_false
+
+        eq 0 c1             ~ they were equal and null char found
+        hopt str_eq_true
+    
+        add 1 a             ~ consume character and loop
+        add 1 b
+        hop str_eq_loop
+
+    $str_eq_false
+        pop b
+        pop a
+        mv 0 r
+        ret
+
+    $str_eq_true
+        pop b
+        pop a
+        mv 1 r
+        ret
+
+~ calculates the length of a string in a
+$strlen
+    push a              ~ save a and zero out r
+    mv 0 r
+
+    $strlen_loop 
+        eq 0 *a         ~ if we reach the null terminator, return
+        hopt strlen_end
+
+        add 1 a         ~ otherwise increment string and return, loop
+        add 1 r
+        hop strlen_loop 
+
+    $strlen_end
+        pop a
+        ret
+    
+$print_string
+    push a
+
+    $print_loop
+        eq 0 *a
+        hopt print_ret
+        
+        print *a
+        add 1 a
+        hop print_loop
+
+    $print_ret
+        pop a
+        ret
