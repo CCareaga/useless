@@ -29,6 +29,15 @@ lnum_t *get_lnum(executable_t *exec, char *fn, int lno) {
     return current;
 }
 
+lnum_t *get_lnum_by_addr(executable_t *exec, int addr) {
+    lnum_t *current = exec->lnums;
+
+    while (current && !(current->start == addr && current->start != current->stop))
+        current = current->next;
+
+    return current;
+}
+
 // prints the debugger prompt :-)
 static void print_prompt() {
     printf("udb >> ");
@@ -50,8 +59,8 @@ static void dump_stack(cpu_t *cpu, int *ram) {
 }
 
 // print the program counter and registers
-static void dump_cpu(cpu_t *cpu, int *ram) {
-    printf("========= CPU ==========\n");
+static void dump_cpu(executable_t *exec, cpu_t *cpu, int *ram) {
+    printf("========= CPU ================\n");
     printf("A: %d \n", ram[A]);
     printf("B: %d \n", ram[B]);
     printf("C: %d \n", ram[C]);
@@ -59,8 +68,11 @@ static void dump_cpu(cpu_t *cpu, int *ram) {
     printf("E: %d \n", ram[E]);
 
     printf("PC: %d \n", cpu->pc);
-    printf("OP: %s \n", operations[(uint16_t) ram[cpu->pc]].op_str);
-    printf("========================\n\n");
+    lnum_t *ln = get_lnum_by_addr(exec, cpu->pc);
+    printf("==============================\n");
+    printf("%s : %d \n\n", ln->fname, ln->num);
+    printf("%s \n", ln->line);
+    printf("==============================\n\n");
     print_prompt();
 }
 
@@ -180,13 +192,13 @@ void vm_debug(executable_t *exec, cpu_t *cpu, int *ram, int op_code) {
             cont = 0;
             stopped = 1;
             system("clear"); 
-            dump_cpu(cpu, ram);
+            dump_cpu(exec, cpu, ram);
             getline(&line, &size, stdin);
         }
     }
     else {
         system("clear"); 
-        dump_cpu(cpu, ram);
+        dump_cpu(exec, cpu, ram);
         getline(&line, &size, stdin);
     }
     

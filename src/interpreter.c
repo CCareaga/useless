@@ -22,7 +22,7 @@ static void *state2(executable_t *exec, char *c, char **start);
 // ========================================================================
 
 // this function adds a new line num struct to the executable
-void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
+void add_line(executable_t *exec, char *fname, int lno, int start, int end, char *line) {
     lnum_t *ln = malloc(sizeof(lnum_t));
 
     char *fn = strdup(fname);
@@ -30,6 +30,7 @@ void add_line(executable_t *exec, char *fname, int lno, int start, int end) {
     ln->num = lno;
     ln->start = start;
     ln->stop = end;
+    ln->line = line;
     ln->next = NULL;
     
     lnum_t *current = exec->lnums;
@@ -305,6 +306,7 @@ executable_t *vm_load(char **fnames, int dbg) {
     while(*fnames) {
         FILE *fp;
         char *line = NULL;
+        char *saved;
         size_t len = 0;
         ssize_t read;
 
@@ -317,6 +319,8 @@ executable_t *vm_load(char **fnames, int dbg) {
 
         while ((read = getline(&line, &len, fp)) != -1 && !err) {
             start = tok_cnt + 1;
+            if (dbg)
+                saved = strdup(line); 
 
             if (line[strspn(line, " \t\v\r\n")] != '\0') {
                 err = tokenize(exec, line);
@@ -325,7 +329,7 @@ executable_t *vm_load(char **fnames, int dbg) {
             }
 
             if (dbg)
-                add_line(exec, *fnames, lno++, start, tok_cnt + 1);
+                add_line(exec, *fnames, lno++, start, tok_cnt + 1, saved);
         }
 
         fclose(fp);

@@ -65,7 +65,8 @@ $strlen
     $strlen_end
         pop a
         ret
-    
+
+~ print the string stored in a
 $print_string
     push a
 
@@ -80,3 +81,28 @@ $print_string
     $print_ret
         pop a
         ret
+
+~  convert the string in a to an integer
+$itoa
+    push a
+    push b
+
+    mv 0 r
+
+    $itoa_loop
+        eq 0 *a
+        hopt itoa_ret
+        
+        mv *a b
+        sub 48 b
+        mul 10 r
+        add b r
+
+        add 1 a
+        hop itoa_loop
+
+    $itoa_ret
+        pop b
+        pop a
+        ret
+

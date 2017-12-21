@@ -3,6 +3,7 @@ entry
 ~ initialise the cpu and start the machine running
 $main
     call init_cpu
+    call load_prog
 
     $mainloop
         eq 0 running
@@ -39,9 +40,11 @@ $vsp 0
 $vbp 0
     
 $running 1
+$op_error 0
 
 $program
     "push 4"
     "push 5"
     "add"
+    "end"
 

@@ -1,0 +1,105 @@
+~ this function will read from the label called "program" 
+~ it will decode one 'line' at a time and places the bytecode into
+~ our virtual ram. 
+
+$start 0
+$in_word 0
+
+$load_prog
+    push a                      ~ save a
+
+    mv &program a               ~ move the start of the code into a
+
+    $line_loop
+        eq 0 *a                 ~ check if we are looking at null
+        hopt end_line 
+
+        eq 1 in_word            ~ check if we are in a word
+        
+        hopt check_space        ~ in_word on, check for space
+        hop check_letter        ~ in_word off, check for letter
+    
+    $end_line
+        eq 1 in_word            ~ edge case: word ends at end of line, save it
+        hopt edge
+        hop not_edge        
+
+        $edge
+            call save_word      ~ save word and check if we are done
+            eq 1 r
+            hopt load_prog_end
+
+        $not_edge               ~ continuing, reset in_word for new line, loop
+            add 1 a
+            mv 0 in_word
+            hop line_loop
+   
+    $check_space
+        eq 32 *a                ~ check if the character is a space
+        hopt is_space
+
+        hop not_space
+
+        $is_space               ~ we were in a word and its a space so save it
+            mv 0 *a
+            call save_word      ~ save the word, check is we are done reading
+
+            eq 1 r          
+            hopt load_prog_end  ~ if the save_word func returns 1, end
+
+            mv 0 in_word        ~ we are no longer in a word
+
+        $not_space              ~ it isnt a space to continue the loop
+            add 1 a
+            hop line_loop
+
+    $check_letter
+        eq 32 *a                ~ check if a is a space
+
+        hopf is_letter          ~ it isnt a space to save the start
+        hop not_letter          ~ it was a space so continue consuming 
+
+        $is_letter          
+            mv a start          ~ save the start of the word
+            mv 1 in_word        ~ flip the in_word flag
+
+        $not_letter             ~ it is just a space, continue loop
+            add 1 a
+            hop line_loop
+
+    $load_prog_end              ~ restore a, return
+        pop a
+        ret
+
+~ translate the word saved in start into an opcode
+~ and save it in ram, if we see end, get out
+$save_word
+    push a             
+    push b
+
+    mv start a
+    call print_string
+
+    mv &end_str b               ~ if the token is equal to "end" return
+    call str_equals
+    eq 1 r
+    hopt save_word_end
+
+    push a
+    mv &arrow a
+    call print_string
+    pop a
+
+    call encode
+    printn r
+    print 10
+    mv 0 r
+    
+    $save_word_end
+        pop b
+        pop a
+        ret
+
+
+$arrow 
+    " => "

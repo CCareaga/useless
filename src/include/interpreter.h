@@ -16,6 +16,7 @@ typedef struct lnode_t {
 // line. this list is only used for the debugger to set break points
 typedef struct lnum_t {
     char *fname;
+    char *line;
     int num;
     int start;
     int stop;
