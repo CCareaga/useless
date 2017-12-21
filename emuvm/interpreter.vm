@@ -1,3 +1,126 @@
+$tok_cnt 0
+$in_tok 0
+$token 0
+
+$first_pass
+    push a
+
+    mv &program a               ~ move the start of the code into a
+    
+    $pass_loop
+        eq 0 *a                     ~ check if we are looking at null
+        hopt end_pass
+
+        eq 1 in_tok                 ~ check if we are in a token
+        
+        hopt space                  ~ we are in a token check for space
+        hop letter                  ~ we aren't in a token check for a letter
+
+    $space
+        eq 32 *a                    ~ check if the character is a space
+
+        hopt found_space
+        hop no_space
+
+        $found_space                ~ we were in a word and its a space so save it
+            
+            eq 36 *token            ~ check to see if the first char is a $
+            hopt found_label        ~ it is so add the label
+
+            add 1 tok_cnt           ~ wasnt a label, just a normal token
+
+            call is_end             ~ check if we are done reading
+
+            eq 1 r          
+            hopt first_pass_end     ~ if the save_word func returns 1, end
+
+            mv 0 in_tok             ~ we are no longer in a word
+
+        $no_space                   ~ it isnt a space to continue the loop
+            add 1 a
+            hop pass_loop
+
+    $letter
+        eq 32 *a                    ~ check if a is a space
+
+        hopf found_letter           ~ it isnt a space so save the start
+        hop no_letter               ~ it was a space so continue consuming 
+
+        $found_letter          
+            mv a token              ~ save the start of the word in token
+            mv 1 in_tok             ~ flip the in_tok flag
+
+        $no_letter                  ~ it is just a space, continue loop
+            add 1 a
+            hop pass_loop
+
+    $end_pass
+        eq 1 in_tok                 ~ edge case: word ends at end of line
+        hopt at_end                
+        hop not_at_end
+
+        $at_end                     ~ this means the token ended on a line
+            eq 36 *token            ~ we check to see if its a label
+            hopt found_label
+
+            add 1 tok_cnt           ~ it wasnt a label so just increment tok_cnt
+
+            call is_end             ~ inc tok_cnt and check if we are done
+            eq 1 r
+            hopt first_pass_end
+
+        $not_at_end                 ~ continuing, reset in_word for new line, loop
+            add 1 a
+            mv 0 in_tok
+            hop pass_loop
+
+    $found_label
+        add 1 token                 ~ skip the $
+        call add_label              ~ we found a label, add it to the list
+
+        add 1 a                     ~ move to the next position in the code and loop
+        mv 0 in_tok
+        hop pass_loop
+
+    $first_pass_end
+        pop a
+        ret 
+
+~ this function checks to see if the current token is "end"
+$is_end
+    push a
+    push b
+    
+    mv token a
+    mv &end_str b
+    call str_equals
+
+    pop b
+    pop a
+    ret
+
+~ this function accepts the string in token and addr in tok_cnt
+$add_label
+    push a
+    push b
+
+    mv &label_table c               ~ get the start of the lbl table
+    mv 0 *a                         ~ add the null terminator
+
+    $add_label_loop
+        eq 0 *c                     ~ check if the spot is empty
+        hopt spot_found
+
+        add 2 c                     ~ spot was full move to the next
+        hop add_label_loop          ~ loop
+
+    $spot_found
+        mv token *c                 ~ we found a spot, save the token
+        add 1 c                     ~ now move over one and save corresponding addr
+        mv tok_cnt *c   
+        add 1 *c                    ~ dont want off by one error
+        ret
+
 ~ this function will read from the label called "program" 
 ~ it will decode one 'line' at a time and places the bytecode into
 ~ our virtual ram. 
@@ -7,6 +130,7 @@ $in_word 0
 
 $load_prog
     push a                      ~ save a
+    call first_pass             ~ first save all the locations of labels
 
     mv &program a               ~ move the start of the code into a
 
@@ -73,11 +197,16 @@ $load_prog
 
 ~ translate the word saved in start into an opcode
 ~ and save it in ram, if we see end, get out
+$ram_ptr &ram
 $save_word
     push a             
     push b
-
+    
     mv start a
+
+    eq 36 *a                    ~ if its a label ignore it and end the func
+    hopt save_word_end
+
     call print_string
 
     mv &end_str b               ~ if the token is equal to "end" return
@@ -93,9 +222,59 @@ $save_word
     call encode
     printn r
     print 10
+    mv r *ram_ptr
+    add 1 ram_ptr
+
     mv 0 r
     
     $save_word_end
+        pop b
+        pop a
+        ret
+
+~ since we ant really dynamically allocate memory and make a linked list
+~ I just set aside some memory to add labels, this limits us to a certain
+~ amount of labels but oh well 
+$label_table
+    0 0
+    0 0
+    0 0
+    0 0 
+    0 0
+    0 0
+    0 0
+    0 0
+    0 0
+    0 0
+
+$is_label
+    push a
+    push b
+    push c
+
+    mv &label_table c       ~ mv start of lbl table into c
+    mv 0 r                  ~ zero out return as our default (lbl not found
+
+    $is_lbl_loop
+        eq 0 *c             ~ see if we are at the end
+        hopt is_lbl_end     
+
+        mv *c b             ~ grab string from table and call str_eq
+        call str_equals
+
+        eq 1 r              ~ if we found a match
+        hopt lbl_found
+    
+        add 2 c             ~ add 2 to c to move to next lbl entry
+        hop is_lbl_loop
+
+    $lbl_found
+        add 1 c             ~ increment c to get the address
+        mv *c r
+        hop is_lbl_end
+
+    $is_lbl_end
+        pop c
         pop b
         pop a
         ret

@@ -1,39 +1,134 @@
-
 ~ nop instruction, do nothing, return success
-$vnop 
-    mv 0 r
+$v_nop 
+    mv 1 r
     ret
 
 ~ push instruction, decrement the sp (grow stack) and place
 ~ the provided argument to where the sp points, return success
-$vpush
+$v_push
     sub 1 vsp
     add 1 pc
     mv *pc *vsp
+    mv 1 r
+    ret
+
+~ zero the item at the top of stack, shrink stack, return
+$v_pop
+    mv 0 *vsp
+    add 1 vsp
+    mv 1 r
+    ret
+
+~ print out item at the top of the stack, return
+$v_print
+    print *vsp 
+    mv 1 r
+    ret
+    
+~ print out item at the top of the stack as a number, return
+$v_printn
+    printn *vsp 
+    mv 1 r
+    ret
+    
+~ remove the top two items from the stack, add and push result
+$v_add
+    push a
+    push b
+
+    mv *vsp a
+    add 1 vsp
+    mv *vsp b
+
+    add b a
+    mv a *vsp
+
+    mv 1 r
+    pop b
+    pop a
+    ret
+
+~ remove the top two items from the stack, sub and push result
+$v_sub
+    push a
+    push b
+
+    mv *vsp a
+    add 1 vsp
+    mv *vsp b
+
+    sub b a
+    mv a *vsp
+
+    mv 1 r
+    pop b
+    pop a
+    ret
+
+~ remove the top two items from the stack, multiply and push result
+$v_mul
+    push a
+    push b
+
+    mv *vsp a
+    add 1 vsp
+    mv *vsp b
+
+    mul b a
+    mv a *vsp
+
+    mv 1 r
+    pop b
+    pop a
+    ret
+
+~ remove the top two items from the stack, divide and push result
+$v_div
+    push a
+    push b
+
+    mv *vsp a
+    add 1 vsp
+    mv *vsp b
+
+    div b a
+    mv a *vsp
+
+    mv 1 r
+    pop b
+    pop a
+    ret
+
+~ return 0 which will tell the main loop to stop running
+$v_exit
     mv 0 r
     ret
 
-~ array elements consist of operation string, operation index
-~ and the number of arguments the operation takes
-
+~ array elements consist of operation string, number of args
+~ and a pointer to the operation routine
 $op_array
-    &nop_str  0 &vnop
-    &push_str 1 &vpush
-    &pop_str  0 0
-    &add_str  0 0
-    &sub_str  0 0
-    &mul_str  0 0
-    &div_str  0 0
+    &nop_str   0 &v_nop
+    &push_str  1 &v_push
+    &pop_str   0 &v_pop
+    &prnt_str  1 &v_print
+    &prntn_str 1 &v_printn
+    &add_str   0 &v_add
+    &sub_str   0 &v_sub
+    &mul_str   0 &v_mul
+    &div_str   0 &v_div
+    &exit_str  0 &v_exit
 $op_array_end
-
 
 $nop_str    "nop"
 $push_str   "push"
 $pop_str    "pop"
+$prnt_str   "print"
+$prntn_str  "printn"
 $add_str    "add"
 $sub_str    "sub"
 $mul_str    "mul"
 $div_str    "div"
+$exit_str   "exit"
 $end_str    "end"
     
 ~ takes string stored in a and uses the op array to turn it
@@ -62,15 +157,35 @@ $encode
 
     $encode_found
         mv encode_idx r
+        hop encode_end
+
+    $encode_not_found
+        call is_label           ~ wasnt an instruction try label
+        eq 0 r                  ~ if is_label ret 0, its not a label
+        hopf encode_end
+
+        call itoa               ~ it wasnt a label either, call itoa
+
+    $encode_end
         pop c
         pop b
         pop a
         ret
 
-    $encode_not_found
-        call itoa
-        pop c
-        pop b
-        pop a
-        ret
-    
+$run_instruction
+    push a
+    push b
+
+    mv &op_array b              ~ mv start of op array to b
+
+    mul 3 a                     ~ multiply index by 3 (sz of element)
+    add 2 a                     ~ add 2 two get the function ptr 
+    add b a                     ~ add base to the offset
+    mv *a a                     ~ derefernce a to get the address of func
+
+    call *a                     ~ call the function!
+
+    pop b
+    pop a
+    ret
+

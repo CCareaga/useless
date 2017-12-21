@@ -682,6 +682,10 @@ int call(cpu_t *cpu, int *ram, uint16_t type) {
             cpu->pc = val - 1;
             break;
         
+        case (ocode(R, 0, 0, 0)):
+            cpu->pc = ram[val] - 1;
+            break;
+
         default:
             return 0;
     }

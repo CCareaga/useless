@@ -3,7 +3,7 @@
 
 #include "interpreter.h"
 
-#define RAM_SZ 4096
+#define RAM_SZ 8192
 
 typedef struct {
     int cmp : 1;

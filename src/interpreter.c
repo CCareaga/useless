@@ -53,8 +53,9 @@ void add_line(executable_t *exec, char *fname, int lno, int start, int end, char
 int is_label(executable_t *exec, char *word) {
     lnode_t *current = exec->labels;
 
-    while (current && strcmp(current->name, word) != 0)
+    while (current && strcmp(current->name, word) != 0) {
         current = current->next;
+    }
 
     return (current) ? current->address : 0;
 }
@@ -289,6 +290,9 @@ executable_t *vm_load(char **fnames, int dbg) {
     executable_t *exec = malloc(sizeof(executable_t));
 
     exec->code = malloc(RAM_SZ);
+    
+    exec->labels = NULL;
+    exec->lnums = NULL;
 
     add_label(exec, "$a",  A);
     add_label(exec, "$b",  B);

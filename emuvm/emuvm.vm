@@ -4,36 +4,50 @@ entry
 $main
     call init_cpu
     call load_prog
+    print 10
 
     $mainloop
-        eq 0 running
+        eq 0 running            ~ make sure we are still running
         hopt end
-    
+
+        mv *pc a                ~ fetch the instruction from the pc 
+        call run_instruction    ~ run the instruction we fetched
+        mv r running            ~ move the return status to runnin
+        add 1 pc                ~ move to the next instruction
+
         hop mainloop
 
 $end
+    print 10
     exit
 
 ~ set the stack pointer and base pointer to the end of ram
 $init_cpu
-    mv &ram vsp
-    add 99 vsp
+    mv &ram_end vsp
     mv vsp vbp
+
+    mv &ram pc
 
     ret
 
 ~~~~~~~~~ variables ~~~~~~~~~
 $ram 
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 0
-    0 0 0 0 0 0 0 0 0 1
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+$ram_end
 
 $pc 0 
 $vsp 0
@@ -45,6 +59,12 @@ $op_error 0
 $program
     "push 4"
     "push 5"
-    "add"
+    "$label"
+    "mul"
+    "push label"
+    "div"
+    "$other_label"
+    "printn"
+    "exit"
     "end"
 
