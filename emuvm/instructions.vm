@@ -22,12 +22,14 @@ $v_pop
 ~ print out item at the top of the stack, return
 $v_print
     print *vsp 
+    call v_pop
     mv 1 r
     ret
     
 ~ print out item at the top of the stack as a number, return
 $v_printn
     printn *vsp 
+    ~ call v_pop
     mv 1 r
     ret
     
@@ -99,6 +101,85 @@ $v_div
     pop a
     ret
 
+$v_eq
+    push a
+    push b
+
+    mv *vsp a
+    add 1 vsp
+    mv *vsp b
+
+    call equals
+    mv r *vsp
+    
+    mv 1 r
+    pop b
+    pop a
+    ret
+
+~ takes the provided arg and starts executing from there
+$v_hop
+    push a
+    
+    add 1 pc
+    mv *pc a
+    mv a pc
+    sub 1 pc
+    add &ram pc 
+
+    mv 1 r
+    pop a
+    ret
+
+~ uses top of stack to test true or false, then hop accordingly
+$v_hopt
+    push a
+    
+    eq 1 *vsp
+    add 1 vsp
+    hopf hopt_end
+
+    add 1 pc
+    mv *pc a
+    mv a pc
+    sub 1 pc
+    add &ram pc 
+    
+    $hopt_end
+        mv 1 r
+        pop a
+        ret
+
+~ uses top of stack to test true or false, then hop accordingly
+$v_hopf
+    push a
+    
+    eq 1 *vsp
+    add 1 vsp
+    hopt hopf_end
+
+    add 1 pc
+    mv *pc a
+    mv a pc
+    sub 1 pc
+    add &ram pc 
+    
+    $hopf_end
+        mv 1 r
+        pop a
+        ret
+
+$v_dup
+    push a
+
+    mv *vsp a
+    sub 1 vsp
+    mv a *vsp
+
+    mv 1 r
+    pop a
+    ret
+
 ~ return 0 which will tell the main loop to stop running
 $v_exit
     mv 0 r
@@ -116,6 +197,11 @@ $op_array
     &sub_str   0 &v_sub
     &mul_str   0 &v_mul
     &div_str   0 &v_div
+    &eq_str    0 &v_eq
+    &hop_str   0 &v_hop
+    &hopt_str  0 &v_hopt
+    &hopf_str  0 &v_hopf
+    &dup_str   0 &v_dup
     &exit_str  0 &v_exit
 $op_array_end
 
@@ -128,6 +214,11 @@ $add_str    "add"
 $sub_str    "sub"
 $mul_str    "mul"
 $div_str    "div"
+$eq_str     "eq"
+$hop_str    "hop"
+$hopt_str   "hopt"
+$hopf_str   "hopf"
+$dup_str    "dup"
 $exit_str   "exit"
 $end_str    "end"
     
@@ -188,4 +279,5 @@ $run_instruction
     pop b
     pop a
     ret
+
 

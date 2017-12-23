@@ -11,10 +11,10 @@ static cpu_t *cpu;
 
 // executes a given executable_t
 void vm_execute(executable_t *e) {
-    ram = malloc(RAM_SZ); 
+    ram = malloc(RAM_SZ * sizeof(int)); 
     cpu = malloc(sizeof(cpu_t)); 
 
-    memset(ram, 0, RAM_SZ);
+    memset(ram, 0, RAM_SZ * sizeof(int));
     memset(cpu, 0, sizeof(cpu_t));
      
     memcpy(ram, e->code, (e->length * sizeof(int)));

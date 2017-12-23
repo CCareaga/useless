@@ -118,7 +118,6 @@ $add_label
         mv token *c                 ~ we found a spot, save the token
         add 1 c                     ~ now move over one and save corresponding addr
         mv tok_cnt *c   
-        add 1 *c                    ~ dont want off by one error
         ret
 
 ~ this function will read from the label called "program" 

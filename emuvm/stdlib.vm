@@ -106,3 +106,21 @@ $itoa
         pop a
         ret
 
+$equals
+    push a
+    push b
+
+    mv 0 r
+
+    eq a b
+    hopt eq_true
+    hop eq_false
+
+    $eq_true
+        mv 1 r
+
+    $eq_false
+        pop b
+        pop a
+        ret
+

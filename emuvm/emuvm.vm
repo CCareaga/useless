@@ -50,6 +50,7 @@ $ram
 $ram_end
 
 $pc 0 
+$flg 0
 $vsp 0
 $vbp 0
     
@@ -57,14 +58,17 @@ $running 1
 $op_error 0
 
 $program
-    "push 4"
-    "push 5"
+    "push 0"
+
     "$label"
-    "mul"
-    "push label"
-    "div"
-    "$other_label"
+    "push 1"
+    "add"
     "printn"
+    "dup"
+    "push 10"
+    "eq"
+    "hopf label"
+
     "exit"
     "end"
 
