@@ -91,11 +91,13 @@ this will run emuvm and emuvm will run a program to calculate fibonacci numbers.
 #### Results
 ---
 One result to note is the performance of both the VMs:
+
 | Machine  | Time to calculate fib(35) |
 | ------------- | ------------- |
 | Intel i3 @ 2.30GHz  | 0.9 seconds |
 | useless  | 5.3 seconds |
 |even-more-useless | 2 min 44 secs |
+
 These include time for interpreting the programs so they aren't perfectly exact but I think they display my point. 
 I am satisifed with the effectiveness of useless, I was able to create a VM, language and debugger advanced enough to write another VM inside the first...
 
