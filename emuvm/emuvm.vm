@@ -58,17 +58,40 @@ $running 1
 $op_error 0
 
 $program
-    "push 0"
-
-    "$label"
-    "push 1"
-    "add"
+    "push 30"
+    "call 1 fib"
     "printn"
-    "dup"
-    "push 10"
-    "eq"
-    "hopf label"
-
     "exit"
+
+    "$fib"
+        "sld 3"
+        "push 0"
+        "eq"
+        "hopf fib_base"
+        "push 0"
+        "ret"
+
+    "$fib_base"
+        "sld 3"
+        "push 3"
+        "lt"
+        "hopf fib_calc"
+        "push 1"
+        "ret"
+
+    "$fib_calc"
+        "sld 3"
+        "push 1"
+        "sub"
+        "call 1 fib"
+
+        "sld 3"
+        "push 2"
+        "sub"
+        "call 1 fib"
+
+        "add"
+        "ret"
+
     "end"
 

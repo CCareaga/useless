@@ -29,21 +29,21 @@ $v_print
 ~ print out item at the top of the stack as a number, return
 $v_printn
     printn *vsp 
-    ~ call v_pop
+    call v_pop
     mv 1 r
     ret
     
 ~ remove the top two items from the stack, add and push result
 $v_add
-    push a
+    push a          ~ ADD
     push b
 
     mv *vsp a
     add 1 vsp
     mv *vsp b
 
-    add b a
-    mv a *vsp
+    add a b
+    mv b *vsp
 
     mv 1 r
     pop b
@@ -52,15 +52,15 @@ $v_add
 
 ~ remove the top two items from the stack, sub and push result
 $v_sub
-    push a
+    push a          ~ SUB
     push b
 
     mv *vsp a
     add 1 vsp
     mv *vsp b
 
-    sub b a
-    mv a *vsp
+    sub a b
+    mv b *vsp
 
     mv 1 r
     pop b
@@ -69,15 +69,15 @@ $v_sub
 
 ~ remove the top two items from the stack, multiply and push result
 $v_mul
-    push a
+    push a              ~ MUL
     push b
 
     mv *vsp a
     add 1 vsp
     mv *vsp b
 
-    mul b a
-    mv a *vsp
+    mul a b
+    mv b *vsp
 
     mv 1 r
     pop b
@@ -86,23 +86,24 @@ $v_mul
 
 ~ remove the top two items from the stack, divide and push result
 $v_div
-    push a
+    push a                  ~ DIV
     push b
 
     mv *vsp a
     add 1 vsp
     mv *vsp b
 
-    div b a
-    mv a *vsp
+    div a b
+    mv b *vsp
 
     mv 1 r
     pop b
     pop a
     ret
 
+~ test if the two items on top are eq, push result
 $v_eq
-    push a
+    push a                  ~ EQ
     push b
 
     mv *vsp a
@@ -117,9 +118,32 @@ $v_eq
     pop a
     ret
 
+~ test if the top is less than second from top
+$v_lt
+    push a                  ~ LESS THAN
+    push b
+
+    mv *vsp a       ~ grab the top two
+    add 1 vsp
+    mv *vsp b
+    
+    mv 0 *vsp       ~ assume the false case
+    lt a b          ~ test for less than
+    hopt v_lt_true  ~ place a 1 on the stack
+    hop v_lt_ret
+    
+    $v_lt_true
+        mv 1 *vsp   ~ place a one on the stack
+    
+    $v_lt_ret
+        mv 1 r
+        pop b
+        pop a
+    ret
+
 ~ takes the provided arg and starts executing from there
 $v_hop
-    push a
+    push a                  ~ vanilla HOP
     
     add 1 pc
     mv *pc a
@@ -133,13 +157,13 @@ $v_hop
 
 ~ uses top of stack to test true or false, then hop accordingly
 $v_hopt
-    push a
+    push a                  ~ HOP TRUE
     
     eq 1 *vsp
     add 1 vsp
+    add 1 pc
     hopf hopt_end
 
-    add 1 pc
     mv *pc a
     mv a pc
     sub 1 pc
@@ -152,13 +176,13 @@ $v_hopt
 
 ~ uses top of stack to test true or false, then hop accordingly
 $v_hopf
-    push a
+    push a                      ~ HOP FALSE
     
     eq 1 *vsp
     add 1 vsp
+    add 1 pc
     hopt hopf_end
 
-    add 1 pc
     mv *pc a
     mv a pc
     sub 1 pc
@@ -169,8 +193,9 @@ $v_hopf
         pop a
         ret
 
+~ pushes a copy of the top
 $v_dup
-    push a
+    push a                  ~ DUP
 
     mv *vsp a
     sub 1 vsp
@@ -180,9 +205,83 @@ $v_dup
     pop a
     ret
 
-~ return 0 which will tell the main loop to stop running
+$v_call
+    push a                  ~ CALL
+    push b
+    
+    add 1 pc
+    mv *pc a        ~ num of args
+    add 1 pc
+    mv *pc b        ~ address of function 
+
+    sub 1 vsp       ~ push argc
+    mv a *vsp
+
+    sub 1 vsp       ~ push the base pointer
+    mv vbp *vsp
+
+    sub 1 vsp       ~ save the program counter
+    mv pc *vsp
+
+    mv vsp vbp      ~ base pointer = stack pointer
+    mv &ram pc      ~ set pc to new function addr
+    add b pc
+    sub 1 pc
+    
+    pop b
+    pop a
+    mv 1 r
+    ret
+
+$v_ret
+    push a              ~ RETURN
+    push b
+
+    mv *vsp a       ~ pop return value
+    add 1 vsp
+
+    mv vbp vsp      ~ grab old stack pointer
+
+    mv *vsp pc      ~ pop the old program counter
+    add 1 vsp
+
+    mv *vsp vbp     ~ pop the base pointer
+    add 1 vsp
+
+    mv *vsp b       ~ args to throw away
+    add 1 vsp
+    add b vsp       ~ pop them all off
+
+    sub 1 vsp       ~ push the return value to stack
+    mv a *vsp
+
+    pop b
+    pop a
+
+    mv 1 r 
+    ret
+
+$v_sld
+    push a              ~ STACK LOAD
+    push b
+    
+    add 1 pc    ~ grab the offset arg
+    mv *pc a
+
+    mv vbp b    ~ mv base pointer into b
+    add a b     ~ add the offset
+
+    sub 1 vsp   ~ push the item we loaded
+    mv *b *vsp
+
+    pop b
+    pop a
+
+    mv 1 r
+    ret
+    
 $v_exit
-    mv 0 r
+    mv 0 r          ~ EXIT
     ret
 
 ~ array elements consist of operation string, number of args
@@ -198,10 +297,14 @@ $op_array
     &mul_str   0 &v_mul
     &div_str   0 &v_div
     &eq_str    0 &v_eq
+    &lt_str    0 &v_lt
     &hop_str   0 &v_hop
     &hopt_str  0 &v_hopt
     &hopf_str  0 &v_hopf
     &dup_str   0 &v_dup
+    &call_str  0 &v_call
+    &ret_str   0 &v_ret
+    &sld_str   0 &v_sld
     &exit_str  0 &v_exit
 $op_array_end
 
@@ -215,10 +318,14 @@ $sub_str    "sub"
 $mul_str    "mul"
 $div_str    "div"
 $eq_str     "eq"
+$lt_str     "lt"
 $hop_str    "hop"
 $hopt_str   "hopt"
 $hopf_str   "hopf"
 $dup_str    "dup"
+$call_str   "call"
+$ret_str    "ret"
+$sld_str    "sld"
 $exit_str   "exit"
 $end_str    "end"
     
@@ -255,7 +362,7 @@ $encode
         eq 0 r                  ~ if is_label ret 0, its not a label
         hopf encode_end
 
-        call itoa               ~ it wasnt a label either, call itoa
+        call atoi               ~ it wasnt a label either, call atoi
 
     $encode_end
         pop c

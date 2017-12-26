@@ -1,4 +1,4 @@
-mv 20 a
+mv 30 a
 call print_fib
 print 10
 

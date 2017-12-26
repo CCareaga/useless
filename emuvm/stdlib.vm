@@ -83,15 +83,20 @@ $print_string
         ret
 
 ~  convert the string in a to an integer
-$itoa
+$neg_flg 0
+$atoi
     push a
     push b
 
     mv 0 r
+    mv 0 neg_flg
 
-    $itoa_loop
+    $atoi_loop
         eq 0 *a
-        hopt itoa_ret
+        hopt atoi_neg_check
+
+        eq 45 *a
+        hopt neg_sign
         
         mv *a b
         sub 48 b
@@ -99,9 +104,22 @@ $itoa
         add b r
 
         add 1 a
-        hop itoa_loop
+        hop atoi_loop
 
-    $itoa_ret
+    $neg_sign
+        mv 1 neg_flg 
+        add 1 a
+        hop atoi_loop
+
+    $atoi_neg_check
+        gt 0 neg_flg
+        hopt negate
+        hop atoi_ret
+
+    $negate
+        mul -1 r
+        
+    $atoi_ret
         pop b
         pop a
         ret
@@ -123,4 +141,3 @@ $equals
         pop b
         pop a
         ret
-
