@@ -32,6 +32,12 @@ $v_printn
     call v_pop
     mv 1 r
     ret
+
+~ print out item at the top of the stack as a number, no pop
+$v_peek
+    printn *vsp 
+    mv 1 r
+    ret
     
 ~ remove the top two items from the stack, add and push result
 $v_add
@@ -292,6 +298,7 @@ $op_array
     &pop_str   0 &v_pop
     &prnt_str  1 &v_print
     &prntn_str 1 &v_printn
+    &peek_str  1 &v_peek
     &add_str   0 &v_add
     &sub_str   0 &v_sub
     &mul_str   0 &v_mul
@@ -313,6 +320,7 @@ $push_str   "push"
 $pop_str    "pop"
 $prnt_str   "print"
 $prntn_str  "printn"
+$peek_str   "peek"
 $add_str    "add"
 $sub_str    "sub"
 $mul_str    "mul"

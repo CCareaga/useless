@@ -191,6 +191,8 @@ $load_prog
             hop line_loop
 
     $load_prog_end              ~ restore a, return
+        print 10
+        print 10
         pop a
         ret
 

@@ -1,5 +1,6 @@
-mv 30 a
-call print_fib
+mv 35 a
+call fib
+printn b
 print 10
 
 exit
@@ -57,5 +58,3 @@ $recurse
     pop a               ~ now pop N back into A and return
     ret
 
-$test
-    "string test"
