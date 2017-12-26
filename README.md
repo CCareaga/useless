@@ -1,13 +1,13 @@
 # useless VM
 ---
 
-In its current state useless is a register-based virtual machine written in C. It has 24 instructions and uses an assembly language smiliar to x86 assembly. After creating useless, I wanted to test it's effectiveness. In order to do this I wrote an even simpler VM that runs inside of useless called even-more-useless VM (emuvm). EmuVM is a very simple stack-based virtual machine written entirely in the language of the useless VM. Along the way I also created a dubugging command-line called udb. It displays registers, the stack, and the current line and supports typical debugging commands such as break, continue, step and print. 
+In its current state, useless is a register-based virtual machine written in C. It has 24 instructions and uses an assembly language smiliar to x86 assembly. After creating useless, I wanted to test it's effectiveness. In order to do this I wrote an even simpler VM that runs inside of useless called even-more-useless VM (emuvm). EmuVM is a very simple stack-based virtual machine written entirely in the language of the useless VM. Along the way I also created a debugging command-line called udb. It displays registers, the stack, and the current line and supports typical debugging commands such as break, continue, step and print. 
 
 NOTE: the creation of nested VM's from scratch is purely a proof-of-concept exercise, hence the name useless. Despite the seemingly futile nature of this repository, I believe this experiment has been extermely valuable to me as a learning experience. I urge others to read through the code and take a crack at writting some simple programs to run in both uvm and emuvm. Hopefully this repo provides a glimpse at the mind-boggling things that can be done in C (or any programming language for that matter).
 
 #### Example Program
 ---
-here is what a program to recursively print a string backwards looks like in useless assembly:
+Here is what a program to recursively print a string backwards looks like in useless assembly:
 
 ```
 mv &src a
@@ -58,7 +58,8 @@ $program
         
     "end"
 ```
-since useless has no way of reading from a file, the program text of the inner vm is embedded inside useless assembly following a label called `$program`. 
+NOTE: since useless has no way of reading from a file, the program text of the inner vm is embedded inside useless assembly following a label called `$program`. 
+
 this program will output:
 ```
 $ ./uvm emuvm/*
@@ -67,7 +68,7 @@ $ ./uvm emuvm/*
 
 #### Building and Running
 ---
-to compile useless run:
+To compile useless run:
 
 ```sh
 $ make
