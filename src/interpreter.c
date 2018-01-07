@@ -348,5 +348,21 @@ executable_t *vm_load(char **fnames, int dbg) {
 
 // TODO: make sure to free the memory we used!
 void vm_unload(executable_t *e) {
-    if (e) free(e);
+    
+    lnode_t *t1;
+    lnum_t *t2;
+
+    while (e->labels) {
+        t1 = e->labels;    
+        e->labels = e->labels->next;
+        free(t1);
+    }
+
+    while (e->lnums) {
+        t2 = e->lnums;    
+        e->lnums = e->lnums->next;
+        free(t2);
+    }
+        
+    free(e);
 }
